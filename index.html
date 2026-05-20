@@ -26,15 +26,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sb{background:var(--bg);border-radius:8px;padding:8px 14px;display:flex;align-items:center;gap:8px;}
 .sb input{background:none;border:none;outline:none;color:var(--text);font-size:14px;width:100%;}
 .sb input::placeholder{color:var(--sub);}
-/* Aviso 24h */
-.aviso24{background:#1a2530;border-left:3px solid #3b82f6;padding:8px 12px;font-size:11px;color:var(--sub);border-bottom:1px solid var(--border);}
 .list{flex:1;overflow-y:auto;}
 .list::-webkit-scrollbar{width:5px;}
 .list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-.ci{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid #1a2530;transition:background .15s;position:relative;}
+.ci{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid #1a2530;transition:background .15s;}
 .ci:hover{background:var(--hover);}.ci.active{background:#2a3942;}
-/* Fade para resolvidos próximos de expirar */
-.ci.expirando{opacity:0.6;}
 .av-wrap{position:relative;flex-shrink:0;}
 .av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;overflow:hidden;}
 .av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
@@ -48,9 +44,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;flex-shrink:0;margin-left:6px;}
 .bp{background:#422006;color:#fbbf24;}.brv{background:#052e16;color:#34d399;}
 .tag-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;margin-top:2px;}
-/* Timer 24h */
-.timer{font-size:10px;color:var(--sub);margin-top:2px;}
-.timer.warn{color:#f59e0b;}
 .empty{display:flex;align-items:center;justify-content:center;height:150px;color:var(--sub);font-size:13px;}
 /* CHAT PANEL */
 .cpanel{flex:1;display:flex;flex-direction:column;background:#0b141a;}
@@ -61,8 +54,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .chav{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0;}
 .chav img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .chi{flex:1;}.chn{font-size:15px;font-weight:500;}.chs{font-size:12px;color:var(--sub);margin-top:2px;}
-.hbtn{background:none;border:1px solid var(--green);color:var(--green);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;}
-.hbtn:disabled{border-color:var(--border);color:var(--sub);cursor:not-allowed;}
+.hbtn{background:none;border:1px solid var(--green);color:var(--green);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;}
+.hbtn:hover{background:var(--green);color:#fff;}
+.hbtn:disabled{border-color:var(--border);color:var(--sub);cursor:not-allowed;background:none;}
 .msgs{flex:1;overflow-y:auto;padding:20px 8%;display:flex;flex-direction:column;gap:6px;}
 .msgs::-webkit-scrollbar{width:5px;}
 .msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
@@ -79,8 +73,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .sndbtn{width:46px;height:46px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .sndbtn:disabled{background:var(--border);cursor:not-allowed;}
 .cc{text-align:center;color:var(--sub);font-size:13px;padding:16px;background:var(--panel);border-top:1px solid var(--border);}
-/* Aviso expiração no chat */
-.exp-banner{background:#1a1a0a;border-top:1px solid #f59e0b;padding:10px 16px;text-align:center;font-size:12px;color:#f59e0b;}
 /* CRM */
 .crm{width:270px;background:var(--panel);border-left:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:none;}
 .crm::-webkit-scrollbar{width:4px;}
@@ -115,7 +107,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="sc" id="sc2"><div class="sn g" id="n2">0</div><div class="sl">Resolvidos</div></div>
   </div>
   <div class="sw"><div class="sb"><span style="color:var(--sub)">🔍</span><input type="text" id="q" placeholder="Buscar conversa..."/></div></div>
-  <div class="aviso24">🕐 Resolvidos ficam visíveis por 24h · Pendentes até serem resolvidos</div>
   <div class="list" id="list"><div class="empty">⏳ Carregando...</div></div>
 </div>
 
@@ -127,142 +118,114 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 var API = 'https://jhon-a2f274aa.base44.app/functions/crm';
 var all = [], fil = 'todos', selId = null, sending = false;
-var MS_24H = 24 * 60 * 60 * 1000;
-
-function isVencido(a) {
-  // Resolvido há mais de 24h → esconde
-  if (a.status !== 'resolvido') return false;
-  var dt = new Date(a.data_contato).getTime();
-  return (Date.now() - dt) > MS_24H;
-}
-
-function tempoRestante(a) {
-  if (a.status !== 'resolvido') return null;
-  var dt = new Date(a.data_contato).getTime();
-  var resto = MS_24H - (Date.now() - dt);
-  if (resto <= 0) return null;
-  var h = Math.floor(resto / 3600000);
-  var m = Math.floor((resto % 3600000) / 60000);
-  return { texto: h > 0 ? h+'h '+m+'min restantes' : m+'min restantes', warn: resto < 3600000 };
-}
 
 function fmt(d) {
   if (!d) return '';
   var dt = new Date(d), h = new Date();
-  if (dt.toDateString() === h.toDateString()) return dt.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
-  return dt.toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit'});
+  if (dt.toDateString() === h.toDateString()) return dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
 }
 function fmtFull(d) {
   if (!d) return '';
-  return new Date(d).toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+  return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});
 }
 function ini(n) {
   if (!n) return '?';
   return n.split(' ').filter(Boolean).map(function(x){return x[0];}).slice(0,2).join('').toUpperCase();
 }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function getSel() { return all.find(function(x){return x.id===selId;})||null; }
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function getSel(){return all.find(function(x){return x.id===selId;})||null;}
 
-function toast(m,t) {
-  var e = document.getElementById('toast');
-  e.textContent = (t==='e'?'❌ ':'✅ ')+m;
-  e.className = 'toast show '+(t==='e'?'e':'s');
+function toast(m,t){
+  var e=document.getElementById('toast');
+  e.textContent=(t==='e'?'❌ ':'✅ ')+m;
+  e.className='toast show '+(t==='e'?'e':'s');
   setTimeout(function(){e.className='toast';},3000);
 }
-
-function avatarHtml(nome, foto) {
-  if (foto) return '<img src="'+esc(foto)+'" onerror="this.style.display=\'none\'" />';
+function avatarHtml(nome,foto){
+  if(foto) return '<img src="'+esc(foto)+'" onerror="this.style.display=\'none\'" />';
   return ini(nome);
 }
-
-function tagHtml(etiquetas, cor) {
-  if (!etiquetas) return '';
-  var bg = cor ? cor+'33' : '#33333388';
-  var tc = cor || '#aaa';
+function tagHtml(etiquetas,cor){
+  if(!etiquetas) return '';
+  var bg=cor?cor+'33':'#33333388', tc=cor||'#aaa';
   return '<span class="tag-chip" style="background:'+bg+';color:'+tc+';border:1px solid '+tc+'50">🏷️ '+esc(etiquetas)+'</span>';
 }
-
-function updateStats() {
-  var visiveis = all.filter(function(x){ return !isVencido(x); });
-  document.getElementById('n0').textContent = visiveis.length;
-  document.getElementById('n1').textContent = visiveis.filter(function(x){return x.status==='pendente';}).length;
-  document.getElementById('n2').textContent = visiveis.filter(function(x){return x.status==='resolvido';}).length;
+function updateStats(){
+  document.getElementById('n0').textContent=all.length;
+  document.getElementById('n1').textContent=all.filter(function(x){return x.status==='pendente';}).length;
+  document.getElementById('n2').textContent=all.filter(function(x){return x.status==='resolvido';}).length;
 }
-
-function setF(f) {
-  fil = f;
+function setF(f){
+  fil=f;
   [['todos','at'],['pendente','ap'],['resolvido','ar']].forEach(function(x,i){
-    document.getElementById('sc'+i).className = 'sc'+(f===x[0]?' '+x[1]:'');
+    document.getElementById('sc'+i).className='sc'+(f===x[0]?' '+x[1]:'');
   });
   render();
 }
-
-function render() {
-  var q = (document.getElementById('q').value||'').toLowerCase();
-  var lst = all.filter(function(a){
-    if (isVencido(a)) return false; // esconde resolvidos >24h
-    return (fil==='todos'||a.status===fil) &&
+function render(){
+  var q=(document.getElementById('q').value||'').toLowerCase();
+  var lst=all.filter(function(a){
+    return (fil==='todos'||a.status===fil)&&
       (!q||(a.nome_aluno||'').toLowerCase().indexOf(q)>=0||(a.mensagem||'').toLowerCase().indexOf(q)>=0||(a.numero_aluno||'').indexOf(q)>=0);
   });
-  var el = document.getElementById('list');
-  if (!lst.length) { el.innerHTML='<div class="empty">🔍 Nenhuma conversa ativa</div>'; return; }
-  el.innerHTML = lst.map(function(a) {
-    var p = a.status==='pendente';
-    var tr = tempoRestante(a);
-    var expirando = tr && tr.warn;
-    return '<div class="ci'+(a.id===selId?' active':'')+(expirando?' expirando':'')+'" data-id="'+a.id+'">'
+  // Ordena: pendentes primeiro, depois por data mais recente
+  lst.sort(function(a,b){
+    if(a.status==='pendente'&&b.status!=='pendente') return -1;
+    if(a.status!=='pendente'&&b.status==='pendente') return 1;
+    return new Date(b.data_contato).getTime()-new Date(a.data_contato).getTime();
+  });
+  var el=document.getElementById('list');
+  if(!lst.length){el.innerHTML='<div class="empty">🔍 Nenhuma conversa</div>';return;}
+  el.innerHTML=lst.map(function(a){
+    var p=a.status==='pendente';
+    return '<div class="ci'+(a.id===selId?' active':'')+'" data-id="'+a.id+'">'
       +'<div class="av-wrap"><div class="av">'+avatarHtml(a.nome_aluno,a.foto)+'</div>'+(p?'<div class="udot"></div>':'')+'</div>'
       +'<div class="cb">'
       +'<div class="r1"><span class="cn">'+esc(a.nome_aluno||'?')+'</span><span class="ct">'+fmt(a.data_contato)+'</span></div>'
       +'<div class="r2"><span class="cp">'+(p?'⏳ ':'✅ ')+esc(a.mensagem||'')+'</span><span class="badge '+(p?'bp':'brv')+'">'+(p?'Pendente':'Resolvido')+'</span></div>'
       +(a.etiquetas?'<div>'+tagHtml(a.etiquetas,a.etiqueta_cor)+'</div>':'')
-      +(tr?'<div class="timer'+(tr.warn?' warn':'')+'">🕐 '+tr.texto+'</div>':'')
       +'</div></div>';
   }).join('');
   el.querySelectorAll('.ci').forEach(function(n){
     n.addEventListener('click',function(){sel(n.getAttribute('data-id'));});
   });
 }
+function sel(id){selId=id;render();var a=getSel();if(a){renderChat(a);renderCRM(a);}}
 
-function sel(id) { selId=id; render(); var a=getSel(); if(a){renderChat(a);renderCRM(a);} }
-
-function renderChat(a) {
-  var p = document.getElementById('cpanel'), pend = a.status==='pendente';
-  var tr = tempoRestante(a);
-  p.innerHTML =
+function renderChat(a){
+  var p=document.getElementById('cpanel'),pend=a.status==='pendente';
+  p.innerHTML=
     '<div class="ch">'
     +'<div class="chav">'+avatarHtml(a.nome_aluno,a.foto)+'</div>'
     +'<div class="chi"><div class="chn">'+esc(a.nome_aluno||'?')+'</div>'
     +'<div class="chs">📞 '+esc(a.numero_aluno)+(a.etiquetas?' &nbsp;'+tagHtml(a.etiquetas,a.etiqueta_cor):'')+'</div></div>'
     +'<div>'+(pend?'<button class="hbtn" id="bres">✅ Resolver</button>':'<button class="hbtn" disabled>✅ Resolvido</button>')+'</div>'
     +'</div>'
-    +(tr && tr.warn ? '<div class="exp-banner">⚠️ Este atendimento será removido da lista em '+tr.texto+'</div>' : '')
     +'<div class="msgs" id="msgs">'
     +'<div class="dsep"><span>'+fmtFull(a.data_contato)+'</span></div>'
     +'<div class="bw"><div class="bub inc"><div class="bsender al">👤 '+esc(a.nome_aluno||'Aluno')+'</div>'+esc(a.mensagem||'')+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>'
-    +'<div class="bw r"><div class="bub out"><div class="bsender bot">🤖 Bot</div>'+esc(a.resposta||'')+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>'
+    +(a.resposta?'<div class="bw r"><div class="bub out"><div class="bsender bot">🤖 Bot</div>'+esc(a.resposta)+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>':'')
     +'</div>'
     +(pend
-      ?'<div class="cia"><textarea class="cta" id="ti" rows="1" placeholder="Digite... (Enter envia)"></textarea><button class="sndbtn" id="sb">➤</button></div>'
-      :'<div class="cc">✅ Atendimento encerrado · '+(tr?'Removido da lista em '+tr.texto:'Histórico disponível por 24h')+'</div>');
-
-  var msgs = document.getElementById('msgs');
-  if (msgs) msgs.scrollTop = msgs.scrollHeight;
-  var bres = document.getElementById('bres');
-  if (bres) bres.addEventListener('click', resolver);
-  var sb = document.getElementById('sb'), ti = document.getElementById('ti');
-  if (sb) sb.addEventListener('click', send);
-  if (ti) {
+      ?'<div class="cia"><textarea class="cta" id="ti" rows="1" placeholder="Digite a resposta... (Enter envia)"></textarea><button class="sndbtn" id="sb">➤</button></div>'
+      :'<div class="cc">✅ Atendimento encerrado em '+fmtFull(a.data_contato)+'</div>');
+  var msgs=document.getElementById('msgs');
+  if(msgs) msgs.scrollTop=msgs.scrollHeight;
+  var bres=document.getElementById('bres');
+  if(bres) bres.addEventListener('click',resolver);
+  var sb=document.getElementById('sb'),ti=document.getElementById('ti');
+  if(sb) sb.addEventListener('click',send);
+  if(ti){
     ti.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,150)+'px';});
     ti.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
   }
 }
 
-function renderCRM(a) {
-  var crm = document.getElementById('crm');
-  crm.style.display = 'block';
-  var tr = tempoRestante(a);
-  crm.innerHTML =
+function renderCRM(a){
+  var crm=document.getElementById('crm');
+  crm.style.display='block';
+  crm.innerHTML=
     '<div class="crm-h">📋 Ficha do Contato</div>'
     +'<div class="crm-sec" style="text-align:center;padding-top:20px">'
     +'<div class="crm-avatar">'+avatarHtml(a.nome_aluno,a.foto)+'</div>'
@@ -272,7 +235,6 @@ function renderCRM(a) {
     +'</div>'
     +'<div class="crm-sec"><div class="crm-t">Status</div>'
     +'<span class="cst '+a.status+'">'+(a.status==='pendente'?'⏳ Pendente':'✅ Resolvido')+'</span>'
-    +(tr?'<div style="font-size:11px;color:'+(tr.warn?'#f59e0b':'var(--sub)')+';margin-top:6px">🕐 '+tr.texto+'</div>':'')
     +'</div>'
     +'<div class="crm-sec"><div class="crm-t">Contato</div>'
     +'<div class="cf"><label>Telefone</label><span>'+esc(a.numero_aluno||'—')+'</span></div>'
@@ -280,64 +242,64 @@ function renderCRM(a) {
     +'</div>'
     +'<div class="crm-sec"><div class="crm-t">Última conversa</div>'
     +'<div class="cf"><label>Pergunta</label><span>'+esc(a.mensagem||'—')+'</span></div>'
-    +'<div class="cf"><label>Resposta do bot</label><span>'+esc(a.resposta||'—')+'</span></div>'
+    +'<div class="cf"><label>Resposta</label><span>'+esc(a.resposta||'—')+'</span></div>'
     +'</div>';
 }
 
-async function resolver() {
-  var a = getSel(); if (!a) return;
-  var b = document.getElementById('bres');
-  if (b){b.disabled=true;b.textContent='⏳...';}
-  try {
-    var r = await fetch(API+'?action=resolver&id='+a.id,{method:'POST'});
-    var d = await r.json();
-    if (d.error) throw new Error(d.error);
-    toast('Resolvido! Histórico disponível por 24h 🕐');
+async function resolver(){
+  var a=getSel();if(!a) return;
+  var b=document.getElementById('bres');
+  if(b){b.disabled=true;b.textContent='⏳...';}
+  try{
+    var r=await fetch(API+'?action=resolver&id='+a.id,{method:'POST'});
+    var d=await r.json();
+    if(d.error) throw new Error(d.error);
+    toast('Resolvido!');
     a.status='resolvido';
     updateStats();render();renderChat(a);renderCRM(a);
-  } catch(e) {
+  }catch(e){
     toast(e.message,'e');
     if(b){b.disabled=false;b.textContent='✅ Resolver';}
   }
 }
 
-async function send() {
-  if (sending) return;
-  var a = getSel(); if (!a) return;
-  var inp = document.getElementById('ti'), msg = inp?inp.value.trim():'';
-  if (!msg){toast('Digite uma mensagem!','e');return;}
+async function send(){
+  if(sending) return;
+  var a=getSel();if(!a) return;
+  var inp=document.getElementById('ti'),msg=inp?inp.value.trim():'';
+  if(!msg){toast('Digite uma mensagem!','e');return;}
   sending=true;
-  var b = document.getElementById('sb');
+  var b=document.getElementById('sb');
   if(b){b.disabled=true;b.innerHTML='<div class="spin"></div>';}
-  try {
-    var r = await fetch(API+'?action=responder',{
+  try{
+    var r=await fetch(API+'?action=responder',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({id:a.id,phone:a.numero_aluno,mensagem:msg})
     });
-    var d = await r.json();
+    var d=await r.json();
     if(d.ok){
       toast('Enviado! 📤');
       a.resposta=msg;a.status='resolvido';
-      if(inp)inp.value='';
+      if(inp) inp.value='';
       updateStats();render();renderChat(a);renderCRM(a);
     } else toast('Erro: '+(d.error||'?'),'e');
-  } catch(e){toast('Erro de conexão','e');}
+  }catch(e){toast('Erro de conexão','e');}
   sending=false;
   if(b){b.disabled=false;b.textContent='➤';}
 }
 
-async function reload() {
-  try {
-    var r = await fetch(API+'?action=list&t='+Date.now());
-    var d = await r.json();
-    if (Array.isArray(d)) {
-      all = d;
+async function reload(){
+  try{
+    var r=await fetch(API+'?action=list&t='+Date.now());
+    var d=await r.json();
+    if(Array.isArray(d)){
+      all=d;
       updateStats();render();
-      var a = getSel();
-      if (a) { renderChat(a);renderCRM(a); }
+      var a=getSel();
+      if(a){renderChat(a);renderCRM(a);}
     }
-  } catch(e){console.error(e);}
+  }catch(e){console.error(e);}
 }
 
 document.getElementById('sc0').addEventListener('click',function(){setF('todos');});
@@ -345,14 +307,11 @@ document.getElementById('sc1').addEventListener('click',function(){setF('pendent
 document.getElementById('sc2').addEventListener('click',function(){setF('resolvido');});
 document.getElementById('q').addEventListener('input',render);
 document.getElementById('rbtn').addEventListener('click',function(){
-  var self=this;
-  reload().then(function(){toast('Atualizado!');setTimeout(function(){self.style.transform='';},400);});
+  reload().then(function(){toast('Atualizado!');});
 });
 
 reload();
 setInterval(reload,20000);
-// Atualiza timers a cada minuto
-setInterval(function(){render();var a=getSel();if(a){renderChat(a);renderCRM(a);}},60000);
 </script>
 </body>
 </html>
