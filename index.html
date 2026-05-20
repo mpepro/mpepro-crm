@@ -872,12 +872,16 @@ function tentarLogin(){
       token=d.token;eu=d.atendente;
       try{localStorage.setItem('crm_token',token);localStorage.setItem('crm_eu',JSON.stringify(eu));localStorage.setItem('crm_slot',d.slot||'principal');localStorage.setItem('crm_disp',d.dispositivo||nomeDisp);}catch(e){}
       entrar();
-    }).catch(function(e){errEl.textContent=e.message||'Erro de conexão';btn.disabled=false;btn.textContent='Entrar';});
+    }).catch(function(e){console.error('Login erro:',e);errEl.textContent=e.message||'Erro de conexão';errEl.style.display='block';btn.disabled=false;btn.textContent='Entrar';});
 }
 
 function entrar(){
+  console.log('entrar() chamado, eu=', eu);
   document.getElementById('login-screen').style.display='none';
-  document.getElementById('main').className='show';
+  var mainEl=document.getElementById('main');
+  if(!mainEl){console.error('ERRO: #main não encontrado!');return;}
+  mainEl.style.display='flex';
+  mainEl.classList.add('show');
   // Mobile: garante que começa na lista
   if(window.innerWidth<=768){
     document.querySelector('.sidebar').classList.remove('hidden-mobile');
