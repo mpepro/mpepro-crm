@@ -79,6 +79,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cta{flex:1;background:#2a3942;border:none;border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;resize:none;outline:none;font-family:inherit;max-height:120px;line-height:1.5;}
 .sndbtn{width:42px;height:42px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .sndbtn:disabled{background:var(--border);cursor:not-allowed;}
+.micbtn{width:38px;height:38px;border-radius:50%;background:var(--hover);border:1px solid var(--border);color:var(--sub);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.micbtn.gravando{background:#ef444433;border-color:var(--red);color:var(--red);animation:pulse 1s infinite;}
 .cc{text-align:center;color:var(--sub);font-size:12px;padding:14px;background:var(--panel);border-top:1px solid var(--border);}
 .crm{width:260px;background:var(--panel);border-left:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:none;}
 .crm.show{display:block;}.crm::-webkit-scrollbar{width:4px;}.crm::-webkit-scrollbar-thumb{background:var(--border);}
@@ -181,6 +183,41 @@ try {
 } catch(e) { token = ''; eu = null; }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderBubble(msg, nomeAluno) {
+  var isOut = msg.tipo === 'enviada';
+  var subtipo = msg.subtipo || 'texto';
+  var conteudo = '';
+  
+  if (subtipo === 'audio') {
+    // Renderiza player de áudio
+    var src = msg.texto;
+    if (src && !src.startsWith('data:') && !src.startsWith('http')) {
+      src = 'data:audio/ogg;base64,' + src;
+    }
+    if (src && src.startsWith('http')) {
+      conteudo = '<audio controls style="max-width:220px;height:36px"><source src="'+src+'">Áudio não suportado</audio>';
+    } else if (src && src.length > 10) {
+      conteudo = '<audio controls style="max-width:220px;height:36px"><source src="'+src+'">Áudio não suportado</audio>';
+    } else {
+      conteudo = '🎤 <em style="color:var(--sub)">Áudio</em>';
+    }
+  } else if (subtipo === 'imagem') {
+    conteudo = renderMsg(msg.texto);
+  } else {
+    conteudo = esc(msg.texto||'');
+  }
+  
+  var sender = isOut ? (msg.de||'Atendente') : (msg.de||nomeAluno||'Aluno');
+  var senderClass = isOut ? (msg.de==='Bot'?'bot':'at') : 'al';
+  var senderIcon = isOut ? (msg.de==='Bot'?'🤖':'👤') : '👤';
+  
+  return '<div class="bw'+(isOut?' r':'')+'"><div class="bub '+(isOut?'out':'inc')+'">'
+    +'<div class="bsender '+senderClass+'">'+senderIcon+' '+esc(sender)+'</div>'
+    +conteudo
+    +'<div class="bmeta"><span class="btime">'+fmt(msg.data)+'</span></div>'
+    +'</div></div>';
+}
+
 function renderMsg(txt){
   if(!txt)return '';
   var s=String(txt).trim();
@@ -306,6 +343,25 @@ function render() {
 
 function sel(id) { selId=id; render(); var a=getSel(); if(a){renderChat(a);renderCRM(a);} }
 
+function renderHistorico(a) {
+  var msgs = [];
+  try { msgs = JSON.parse(a.mensagens || '[]'); } catch(e) {}
+  
+  // Se não tem histórico, usa os campos legados
+  if (!msgs || msgs.length === 0) {
+    var html = '';
+    if (a.mensagem) {
+      html += '<div class="bw"><div class="bub inc"><div class="bsender al">👤 '+esc(a.nome_aluno||'Aluno')+'</div>'+renderMsg(a.mensagem)+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>';
+    }
+    if (a.resposta) {
+      html += '<div class="bw r"><div class="bub out"><div class="bsender '+(a.atendente_nome?'at':'bot')+'">'+esc(a.atendente_nome||'🤖 Bot')+'</div>'+esc(a.resposta)+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>';
+    }
+    return html || '<div class="empty">Sem mensagens</div>';
+  }
+  
+  return msgs.map(function(m) { return renderBubble(m, a.nome_aluno); }).join('');
+}
+
 function renderChat(a) {
   var pend=a.status==='pendente', emAt=a.status==='em_atendimento';
   var minhaVez = (emAt && a.atendente_id===eu.id) || eu.funcao==='Administrador';
@@ -330,11 +386,10 @@ function renderChat(a) {
     +'<div class="ch-btns">'+botoes+'</div></div>'
     +'<div class="msgs" id="msgs">'
     +'<div class="dsep"><span>'+fmtFull(a.data_contato)+'</span></div>'
-    +'<div class="bw"><div class="bub inc"><div class="bsender al">👤 '+esc(a.nome_aluno||'Aluno')+'</div>'+renderMsg(a.mensagem||'')+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>'
-    +(a.resposta?'<div class="bw r"><div class="bub out"><div class="bsender '+(a.atendente_nome?'at':'bot')+'">'+esc(a.atendente_nome||'🤖 Bot')+'</div>'+esc(a.resposta)+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>':'')
+    +renderHistorico(a)
     +transferEvs+'</div>'
     +(minhaVez
-      ?'<div class="cia"><textarea class="cta" id="ti" rows="1" placeholder="Responder via WhatsApp..." onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();send();}" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,120)+\'px\'"></textarea><button class="sndbtn" onclick="send()">➤</button></div>'
+      ?'<div class="cia"><textarea class="cta" id="ti" rows="1" placeholder="Responder via WhatsApp..." onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();send();}" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,120)+\'px\'"></textarea><button class="micbtn" id="micbtn" onclick="toggleMic()" title="Gravar áudio">🎤</button><button class="sndbtn" id="sb" onclick="send()">➤</button></div>'
       :a.status==='resolvido'?'<div class="cc">✅ Resolvido por '+(a.atendente_nome||'Bot')+' em '+fmtFull(a.data_contato)+'</div>'
       :'<div class="cc">⏳ Aguardando atendente assumir</div>');
   var msgs=document.getElementById('msgs'); if(msgs) msgs.scrollTop=msgs.scrollHeight;
@@ -450,6 +505,62 @@ if (token && eu) {
 } else {
   document.getElementById('loginScreen').style.display = 'flex';
 }
+// ── GRAVAÇÃO DE ÁUDIO ──────────────────────────────────
+var mediaRec = null, audioChunks = [], gravando = false;
+
+function toggleMic() {
+  if (gravando) {
+    pararGravacao();
+  } else {
+    iniciarGravacao();
+  }
+}
+
+function iniciarGravacao() {
+  if (!navigator.mediaDevices) { toast('Microfone não disponível','e'); return; }
+  navigator.mediaDevices.getUserMedia({audio: true}).then(function(stream) {
+    audioChunks = [];
+    mediaRec = new MediaRecorder(stream);
+    mediaRec.ondataavailable = function(e) { if(e.data.size>0) audioChunks.push(e.data); };
+    mediaRec.onstop = function() {
+      var blob = new Blob(audioChunks, {type:'audio/ogg; codecs=opus'});
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        var base64 = reader.result.split(',')[1];
+        enviarAudio(base64);
+      };
+      reader.readAsDataURL(blob);
+      stream.getTracks().forEach(function(t){t.stop();});
+    };
+    mediaRec.start();
+    gravando = true;
+    var btn = document.getElementById('micbtn');
+    if(btn) { btn.classList.add('gravando'); btn.textContent='⏹'; btn.title='Parar gravação'; }
+    toast('🎤 Gravando... clique para parar');
+  }).catch(function(e) { toast('Erro ao acessar microfone: '+e.message,'e'); });
+}
+
+function pararGravacao() {
+  if (mediaRec && mediaRec.state !== 'inactive') mediaRec.stop();
+  gravando = false;
+  var btn = document.getElementById('micbtn');
+  if(btn) { btn.classList.remove('gravando'); btn.textContent='🎤'; btn.title='Gravar áudio'; }
+}
+
+function enviarAudio(base64) {
+  var a = getSel(); if(!a) return;
+  var btn = document.getElementById('micbtn');
+  if(btn) { btn.disabled=true; btn.textContent='⏳'; }
+  fetch(API+'?action=enviarAudio', {
+    method:'POST', headers:authH(),
+    body: JSON.stringify({id:a.id, phone:a.numero_aluno, audioBase64:base64})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.ok){ toast('Áudio enviado! 🎤'); reload(); }
+    else toast('Erro: '+(d.error||'?'),'e');
+    if(btn){btn.disabled=false;btn.textContent='🎤';}
+  }).catch(function(){ toast('Erro','e'); if(btn){btn.disabled=false;btn.textContent='🎤';} });
+}
+
 setInterval(function(){if(token)reload();}, 20000);
 </script>
 </body>
