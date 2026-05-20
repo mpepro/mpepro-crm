@@ -249,18 +249,29 @@ async function doLogin(){
   var email=document.getElementById('lemail').value.trim();
   var senha=document.getElementById('lsenha').value;
   var btn=document.getElementById('lbtn');
-  if(!email||!senha)return;
+  var errEl=document.getElementById('lerr');
+  if(!email||!senha){errEl.textContent='Preencha e-mail e senha';return;}
   btn.textContent='Entrando...';btn.disabled=true;
-  document.getElementById('lerr').textContent='';
+  errEl.textContent='';
   try{
-    var r=await fetch(API+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,senha})});
-    var d=await r.json();
-    if(d.error){document.getElementById('lerr').textContent=d.error;btn.textContent='Entrar';btn.disabled=false;return;}
+    var r=await fetch(API+'?action=login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:email,senha:senha})
+    });
+    var txt=await r.text();
+    var d;
+    try{d=JSON.parse(txt);}catch(pe){errEl.textContent='Erro no servidor: '+txt.slice(0,80);btn.textContent='Entrar';btn.disabled=false;return;}
+    if(d.error){errEl.textContent=d.error;btn.textContent='Entrar';btn.disabled=false;return;}
+    if(!d.ok||!d.token){errEl.textContent='Resposta inválida do servidor';btn.textContent='Entrar';btn.disabled=false;return;}
     token=d.token;eu=d.atendente;
     localStorage.setItem('crm_token',token);
     localStorage.setItem('crm_eu',JSON.stringify(eu));
     mostrarApp();
-  }catch(e){document.getElementById('lerr').textContent='Erro de conexão';btn.textContent='Entrar';btn.disabled=false;}
+  }catch(e){
+    errEl.textContent='Erro de conexão: '+e.message;
+    btn.textContent='Entrar';btn.disabled=false;
+  }
 }
 document.getElementById('lbtn').addEventListener('click',doLogin);
 document.getElementById('lsenha').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
