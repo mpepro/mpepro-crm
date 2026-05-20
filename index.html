@@ -336,9 +336,16 @@ function avHTML(nome,foto,size){size=size||48;var bg=avColor(nome);if(foto&&foto
 function renderMsg(txt){
   if(!txt)return'';
   var s=String(txt).trim();
-  if(s.startsWith('data:image/')){return'<img src="'+s+'" style="max-width:220px;border-radius:6px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
-  if(s.startsWith('/9j/')||s.startsWith('iVBOR')||s.startsWith('R0lG')){var m=s.startsWith('iVBOR')?'image/png':s.startsWith('R0lG')?'image/gif':'image/jpeg';return'<img src="data:'+m+';base64,'+s+'" style="max-width:220px;border-radius:6px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
-  if(s.length>500&&/^[A-Za-z0-9+\/]+=*$/.test(s.replace(/[\r\n]/g,''))){return'<img src="data:image/jpeg;base64,'+s+'" style="max-width:220px;border-radius:6px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
+  if(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)/i.test(s)||/^https?:\/\/.*media.*whatsapp/i.test(s)){
+    return'<img src="'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" onerror="this.outerHTML=\'<span style=\\'color:var(--sub)\\'>🖼️ Imagem</span>\'" />';
+  }
+  if(s.startsWith('data:image/')){return'<img src="'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
+  if(s.startsWith('/9j/')){return'<img src="data:image/jpeg;base64,'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
+  if(s.startsWith('iVBOR')){return'<img src="data:image/png;base64,'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
+  if(s.startsWith('R0lG')){return'<img src="data:image/gif;base64,'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
+  if(s.length>1000&&/^[A-Za-z0-9+\/\r\n]+=*$/.test(s.replace(/[\r\n]/g,''))){
+    return'<img src="data:image/jpeg;base64,'+s.replace(/[\r\n]/g,'')+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" onerror="this.outerHTML=\'<span style=\\'color:var(--sub)\\'>🖼️ Imagem (formato não suportado)</span>\'" />';
+  }
   return esc(txt);
 }
 
@@ -364,7 +371,7 @@ function renderBubble(msg,nomeAluno,idx){
   var sub=msg.subtipo||'texto';
   var conteudo='';
   if(sub==='audio'){conteudo=renderAudio(msg.texto,isOut?'out':'in',idx);}
-  else if(sub==='imagem'){conteudo=renderMsg(msg.texto);}
+  else if(sub==='imagem'||sub==='image'||sub==='photo'){conteudo=renderImagem(msg.texto);}
   else{conteudo=renderMsg(msg.texto||'');}
   var sender=isOut?(msg.de||'Atendente'):(msg.de||nomeAluno||'Aluno');
   var sCls=isOut?(msg.de==='Bot'?'bot':'at'):'al';
@@ -374,6 +381,24 @@ function renderBubble(msg,nomeAluno,idx){
     +conteudo
     +'<div class="bmeta"><span class="btime">'+fmt(msg.data)+'</span></div>'
     +'</div></div>';
+}
+
+function renderImagem(txt){
+  if(!txt)return'<div style="color:var(--sub);font-size:12px">🖼️ [imagem]</div>';
+  var s=String(txt).trim();
+  var src='';
+  if(s.startsWith('http')){src=s;}
+  else if(s.startsWith('data:image')){src=s;}
+  else if(s.startsWith('/9j/')){src='data:image/jpeg;base64,'+s;}
+  else if(s.startsWith('iVBOR')){src='data:image/png;base64,'+s;}
+  else if(s.startsWith('R0lG')){src='data:image/gif;base64,'+s;}
+  else if(s.length>200){src='data:image/jpeg;base64,'+s.replace(/[\r\n]/g,'');}
+  if(src){
+    return'<img src="'+src+'" style="max-width:240px;max-height:300px;border-radius:8px;display:block;cursor:pointer;object-fit:cover" '
+      +'onclick="window.open(this.src,\'_blank\')" '
+      +'onerror="this.outerHTML=\'<div style=\\'color:var(--sub);font-size:12px;padding:4px 0\\'>🖼️ Imagem (clique para abrir)</div>\';this.style.cursor=\'pointer\'" />';
+  }
+  return'<div style="color:var(--sub);font-size:12px">🖼️ [imagem]</div>';
 }
 
 function toggleAudio(audioId,waveId,btnId){
