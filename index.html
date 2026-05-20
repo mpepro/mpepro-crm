@@ -651,19 +651,33 @@ function cancelarGravacao(){
 
 function pararEEnviarGravacao(){
   if(!gravando)return;
-  if(mediaRec&&mediaRec.state!=='inactive'){
-    mediaRec.onstop=function(){
-      var blob=new Blob(audioChunks,{type:'audio/ogg; codecs=opus'});
-      var reader=new FileReader();
-      reader.onloadend=function(){
-        var base64=reader.result.split(',')[1];
-        _enviarAudio(base64);
-      };
-      reader.readAsDataURL(blob);
+  if(!mediaRec||mediaRec.state==='inactive')return;
+  // IMPORTANTE: define onstop ANTES de chamar stop()
+  mediaRec.onstop=function(){
+    var blob=new Blob(audioChunks,{type:'audio/ogg; codecs=opus'});
+    var reader=new FileReader();
+    reader.onloadend=function(){
+      var base64=reader.result.split(',')[1];
+      _enviarAudio(base64);
     };
-    mediaRec.stop();
+    reader.readAsDataURL(blob);
+  };
+  // Para a gravação (sem chamar _pararGravacao ainda, pois stop() é async)
+  gravando=false;
+  if(recTimer)clearInterval(recTimer);recTimer=null;
+  if(animFrame)cancelAnimationFrame(animFrame);animFrame=null;
+  if(micStream)micStream.getTracks().forEach(function(t){t.stop();});
+  if(audioContext&&audioContext.state!=='closed')audioContext.close().catch(function(){});
+  audioContext=null;analyser=null;
+  document.getElementById('rec-bar').classList.remove('show');
+  var a=getSel();
+  if(a&&a.status!=='resolvido'&&(a.atendente_id===eu.id||eu.funcao==='Administrador')){
+    document.getElementById('c-input').style.display='flex';
   }
-  _pararGravacao();
+  document.getElementById('rec-time').textContent='0:00';
+  var wave=document.getElementById('rec-wave');if(wave)wave.innerHTML='';
+  // Só agora chama stop — o onstop vai disparar com os chunks completos
+  mediaRec.stop();
 }
 
 function _pararGravacao(){
@@ -673,7 +687,7 @@ function _pararGravacao(){
   if(mediaRec&&mediaRec.state!=='inactive')mediaRec.stop();
   if(micStream)micStream.getTracks().forEach(function(t){t.stop();});
   if(audioContext&&audioContext.state!=='closed')audioContext.close().catch(function(){});
-  audioContext=null;analyser=null;micStream=null;
+  audioContext=null;analyser=null;micStream=null;mediaRec=null;
   document.getElementById('rec-bar').classList.remove('show');
   var a=getSel();
   if(a&&a.status!=='resolvido'&&(a.atendente_id===eu.id||eu.funcao==='Administrador')){
