@@ -3,660 +3,808 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>MPEPro — Atendimentos</title>
+<title>MPEPro CRM</title>
 <style>
-:root{--bg:#111b21;--panel:#202c33;--hover:#2a3942;--border:#3b4a54;--text:#e9edef;--sub:#8696a0;--green:#00a884;--orange:#f59e0b;--red:#ef4444;}
+:root{
+  --bg:#111b21;--panel:#202c33;--hover:#2a3942;--border:#3b4a54;
+  --txt:#e9edef;--sub:#8696a0;--green:#00a884;--green2:#128c7e;
+  --orange:#f59e0b;--red:#ef4444;--blue:#3b82f6;--out:#005c4b;
+}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden;}
-.login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;}
-.login-box{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:360px;text-align:center;}
-.login-logo{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#00a884,#128c7e);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;}
-.login-title{font-size:20px;font-weight:700;margin-bottom:4px;}
-.login-sub{font-size:13px;color:var(--sub);margin-bottom:28px;}
-.login-field{margin-bottom:14px;text-align:left;}
-.login-field label{font-size:12px;color:var(--sub);display:block;margin-bottom:6px;}
-.login-field input{width:100%;background:#2a3942;border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;transition:border .2s;}
-.login-field input:focus{border-color:var(--green);}
-.login-btn{width:100%;background:var(--green);border:none;color:#fff;padding:12px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;}
-.login-err{color:#f87171;font-size:13px;margin-top:10px;min-height:20px;word-break:break-all;}
-.main{display:none;width:100%;height:100vh;}
-.main.show{display:flex;}
-.sidebar{width:340px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
-.top{background:#1f2c34;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;height:58px;flex-shrink:0;}
-.logo{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
-.top-info{flex:1;margin-left:10px;}.top-nome{font-size:14px;font-weight:600;}.top-funcao{font-size:11px;color:var(--sub);}
-.top-btns{display:flex;gap:6px;}
-.icon-btn{background:none;border:none;color:var(--sub);cursor:pointer;font-size:18px;padding:4px;border-radius:6px;}
-.stats{display:flex;padding:8px 10px;gap:5px;background:#1a2530;border-bottom:1px solid var(--border);flex-shrink:0;}
-.sc{flex:1;background:var(--bg);border-radius:8px;padding:7px 4px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .2s;}
-.sc.at{border-color:#3b82f6;background:#1e2d47;}.sc.ap{border-color:var(--orange);background:#2d1f0a;}.sc.ae{border-color:#60a5fa;background:#0f1f35;}.sc.ar{border-color:var(--green);background:#0a1f14;}
-.sn{font-size:18px;font-weight:700;}.sn.b{color:#60a5fa;}.sn.o{color:var(--orange);}.sn.lb{color:#93c5fd;}.sn.g{color:var(--green);}
-.sl{font-size:10px;color:var(--sub);}
-.sw{padding:7px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.sb{background:var(--bg);border-radius:8px;padding:7px 12px;display:flex;align-items:center;gap:8px;}
-.sb input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;}
-.list{flex:1;overflow-y:auto;}
-.list::-webkit-scrollbar{width:4px;}.list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-.ci{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #1a2530;transition:background .15s;}
-.ci:hover{background:var(--hover);}.ci.active{background:#2a3942;}
-.av-wrap{position:relative;flex-shrink:0;}
-.av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;overflow:hidden;background:linear-gradient(135deg,#667eea,#764ba2);}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:var(--bg);color:var(--txt);height:100vh;display:flex;overflow:hidden;font-size:14px;}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200;}
+.lbox{background:var(--panel);border-radius:18px;padding:40px 36px;width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.llogo{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green2));display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 18px;}
+.ltitle{font-size:20px;font-weight:700;margin-bottom:4px;}
+.lsub{font-size:13px;color:var(--sub);margin-bottom:28px;}
+.lfield{margin-bottom:14px;text-align:left;}
+.lfield label{font-size:12px;color:var(--sub);display:block;margin-bottom:5px;font-weight:500;}
+.lfield input{width:100%;background:#2a3942;border:1.5px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--txt);font-size:14px;outline:none;transition:border .2s;}
+.lfield input:focus{border-color:var(--green);}
+.lbtn{width:100%;background:var(--green);border:none;color:#fff;padding:13px;border-radius:9px;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;transition:background .2s;}
+.lbtn:hover{background:var(--green2);}
+.lerr{color:#f87171;font-size:13px;margin-top:12px;min-height:18px;}
+
+/* ── LAYOUT ── */
+#main{display:none;width:100%;height:100vh;}
+#main.show{display:flex;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:360px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.s-top{background:#202c33;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;height:60px;border-bottom:1px solid var(--border);}
+.s-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;cursor:pointer;overflow:hidden;flex-shrink:0;}
+.s-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.s-top-right{display:flex;gap:4px;align-items:center;}
+.iBtn{background:none;border:none;color:var(--sub);cursor:pointer;font-size:20px;padding:6px;border-radius:50%;transition:background .2s;}
+.iBtn:hover{background:var(--hover);}
+/* Stats */
+.s-stats{display:flex;padding:8px 12px;gap:6px;background:#1a2530;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sstat{flex:1;border-radius:8px;padding:7px 4px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .18s;background:var(--bg);}
+.sstat.sel-all{border-color:var(--blue);background:#1e2d47;}
+.sstat.sel-pend{border-color:var(--orange);background:#2d1f0a;}
+.sstat.sel-em{border-color:var(--blue);background:#0f1f35;}
+.sstat.sel-res{border-color:var(--green);background:#0a1f14;}
+.sstat-n{font-size:17px;font-weight:700;}
+.sstat-l{font-size:10px;color:var(--sub);margin-top:1px;}
+/* Busca */
+.s-search{padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.s-search-inner{background:var(--bg);border-radius:9px;padding:8px 14px;display:flex;align-items:center;gap:8px;}
+.s-search-inner input{background:none;border:none;outline:none;color:var(--txt);font-size:13px;width:100%;}
+.s-search-inner input::placeholder{color:var(--sub);}
+/* Lista */
+.s-list{flex:1;overflow-y:auto;}
+.s-list::-webkit-scrollbar{width:4px;}
+.s-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.ci{display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;border-bottom:1px solid #1a2530;transition:background .12s;position:relative;}
+.ci:hover{background:var(--hover);}
+.ci.active{background:var(--hover);}
+.ci-av{position:relative;flex-shrink:0;}
+.av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0;}
 .av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.udot{position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;border:2px solid var(--panel);}
-.cb{flex:1;min-width:0;}.r1{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
-.cn{font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ct{font-size:11px;color:var(--sub);flex-shrink:0;margin-left:6px;}
-.r2{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
-.cp{font-size:12px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
-.badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;flex-shrink:0;margin-left:5px;}
-.bp{background:#422006;color:#fbbf24;}.be{background:#0f1f35;color:#93c5fd;}.brv{background:#052e16;color:#34d399;}
-.atbadge{font-size:10px;color:var(--sub);margin-top:2px;}
-.tag-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:20px;font-size:10px;font-weight:600;}
-.empty{display:flex;align-items:center;justify-content:center;height:120px;color:var(--sub);font-size:13px;}
-.cpanel{flex:1;display:flex;flex-direction:column;background:#0b141a;}
-.cempty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);gap:12px;}
-.cempty .bi{font-size:70px;opacity:.1;}.cempty h3{font-size:20px;font-weight:300;color:#aebac1;}
-.ch{background:var(--panel);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.chav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#667eea,#764ba2);}
-.chav img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.chi{flex:1;}.chn{font-size:14px;font-weight:600;}.chs{font-size:11px;color:var(--sub);margin-top:1px;}
-.ch-btns{display:flex;gap:6px;}
-.hbtn{background:none;border:1px solid;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s;}
-.hbtn.verde{border-color:var(--green);color:var(--green);}.hbtn.verde:hover{background:var(--green);color:#fff;}
-.hbtn.azul{border-color:#3b82f6;color:#60a5fa;}.hbtn.azul:hover{background:#3b82f6;color:#fff;}
-.hbtn.laranja{border-color:var(--orange);color:var(--orange);}.hbtn.laranja:hover{background:var(--orange);color:#fff;}
-.hbtn:disabled{border-color:var(--border);color:var(--sub);cursor:not-allowed;background:none;}
-.msgs{flex:1;overflow-y:auto;padding:16px 6%;display:flex;flex-direction:column;gap:5px;}
-.msgs::-webkit-scrollbar{width:4px;}.msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-.dsep{text-align:center;margin:8px 0;}.dsep span{background:#182229;color:var(--sub);font-size:11px;padding:4px 10px;border-radius:8px;}
-.transfer-ev{text-align:center;margin:6px 0;}.transfer-ev span{background:#1a2530;color:var(--sub);font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);}
-.bw{display:flex;margin-bottom:2px;}.bw.r{justify-content:flex-end;}
-.bub{max-width:65%;padding:8px 11px 5px;border-radius:8px;font-size:13px;line-height:1.55;word-break:break-word;}
-.inc{background:var(--panel);border-radius:0 8px 8px 8px;}.out{background:#005c4b;border-radius:8px 0 8px 8px;}
-.bsender{font-size:11px;font-weight:600;margin-bottom:2px;}.bsender.al{color:#60a5fa;}.bsender.bot{color:#34d399;}.bsender.at{color:#f59e0b;}
-.bmeta{display:flex;justify-content:flex-end;margin-top:3px;}.btime{font-size:10px;color:rgba(255,255,255,.35);}
-.cia{background:var(--panel);border-top:1px solid var(--border);padding:10px 14px;display:flex;align-items:flex-end;gap:8px;flex-shrink:0;}
-.cta{flex:1;background:#2a3942;border:none;border-radius:10px;padding:10px 14px;color:var(--text);font-size:13px;resize:none;outline:none;font-family:inherit;max-height:120px;line-height:1.5;}
-.sndbtn{width:42px;height:42px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.sndbtn:disabled{background:var(--border);cursor:not-allowed;}
-.micbtn{width:38px;height:38px;border-radius:50%;background:var(--hover);border:1px solid var(--border);color:var(--sub);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
-.micbtn.gravando{background:#ef444433;border-color:var(--red);color:var(--red);animation:pulse 1s infinite;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center;}
-.modal-box{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:24px;min-width:360px;max-width:580px;max-height:80vh;overflow-y:auto;}
-.modal-box h3{margin:0 0 16px;font-size:16px;color:var(--txt);}
-.modal-close{float:right;background:none;border:none;color:var(--sub);font-size:18px;cursor:pointer;}
-.disp-atendente{border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:12px;}
-.disp-atendente:last-child{border-bottom:none;margin-bottom:0;}
-.disp-nome-at{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:8px;}
-.disp-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;}
-.disp-slot{font-size:11px;padding:2px 8px;border-radius:10px;flex-shrink:0;margin-top:2px;}
-.disp-slot.p{background:#3b82f622;color:#3b82f6;}
-.disp-slot.s{background:#8b5cf622;color:#a78bfa;}
-.disp-info{flex:1;}
-.disp-info .di-nome{font-size:12px;color:var(--txt);}
-.disp-info .di-sub{font-size:11px;color:var(--sub);}
-.btn-rev{font-size:11px;padding:3px 9px;border-radius:6px;background:#ef444422;border:1px solid #ef4444;color:#ef4444;cursor:pointer;}
-.disp-vazio{font-size:12px;color:var(--sub);font-style:italic;}
-.cc{text-align:center;color:var(--sub);font-size:12px;padding:14px;background:var(--panel);border-top:1px solid var(--border);}
-.crm{width:260px;background:var(--panel);border-left:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:none;}
-.crm.show{display:block;}.crm::-webkit-scrollbar{width:4px;}.crm::-webkit-scrollbar-thumb{background:var(--border);}
-.crm-h{padding:12px 14px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;}
-.crm-sec{padding:12px 14px;border-bottom:1px solid var(--border);}
-.crm-t{font-size:9px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;font-weight:700;}
-.cf{margin-bottom:7px;}.cf label{font-size:10px;color:var(--sub);display:block;margin-bottom:2px;}.cf span{font-size:12px;color:var(--text);}
-.cst{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
-.cst.pendente{background:#422006;color:#fbbf24;}.cst.em_atendimento{background:#0f1f35;color:#93c5fd;}.cst.resolvido{background:#052e16;color:#34d399;}
-.crm-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;margin:0 auto 8px;overflow:hidden;background:linear-gradient(135deg,#667eea,#764ba2);}
-.crm-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.at-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:#1a2530;border:1px solid var(--border);font-size:11px;margin-top:6px;}
-.at-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:200;}
-.modal-bg.show{display:flex;}
-.modal{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px;width:340px;}
-.modal h3{font-size:16px;font-weight:600;margin-bottom:16px;}
-.modal-at{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .2s;margin-bottom:8px;}
-.modal-at:hover{background:var(--hover);}.modal-at.sel{border-color:var(--green);background:#0a1f14;}
-.modal-av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
-.modal-info{flex:1;}.modal-nome{font-size:13px;font-weight:600;}.modal-funcao{font-size:11px;color:var(--sub);}
-.modal-motivo{width:100%;background:#2a3942;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;margin-top:12px;font-family:inherit;}
-.modal-motivo:focus{border-color:var(--green);}
-.modal-btns{display:flex;gap:8px;margin-top:16px;}
-.modal-btn{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;}
-.modal-btn.cancel{background:var(--hover);color:var(--sub);}.modal-btn.confirm{background:var(--green);color:#fff;}.modal-btn.confirm:disabled{background:var(--border);cursor:not-allowed;}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120px);background:#182229;border:1px solid var(--border);border-radius:12px;padding:10px 18px;font-size:13px;z-index:999;transition:transform .3s;white-space:nowrap;}
-.toast.show{transform:translateX(-50%) translateY(0);}.toast.s{border-color:var(--green);color:#34d399;}.toast.e{border-color:var(--red);color:#f87171;}
-.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;}
+.udot{position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;border:2px solid var(--panel);}
+.udot.pend{background:var(--orange);}
+.udot.em{background:var(--blue);}
+.ci-body{flex:1;min-width:0;}
+.ci-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.ci-name{font-size:15px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.ci-time{font-size:11px;color:var(--sub);flex-shrink:0;margin-left:8px;}
+.ci-row2{display:flex;justify-content:space-between;align-items:center;}
+.ci-msg{font-size:13px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.badge{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;flex-shrink:0;margin-left:6px;}
+.badge.pend{background:#422006;color:#fbbf24;}
+.badge.em{background:#0f1f35;color:#93c5fd;}
+.badge.res{background:#052e16;color:#34d399;}
+.ci-at{font-size:10px;color:var(--sub);margin-top:2px;}
+.tag-chip{display:inline-flex;align-items:center;padding:1px 6px;border-radius:20px;font-size:10px;font-weight:600;margin-left:4px;}
+
+/* ── CHAT PANEL ── */
+.cpanel{flex:1;display:flex;flex-direction:column;background:#0b141a;position:relative;}
+.cpanel::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ctext y='200' font-size='150' opacity='.015' text-anchor='middle' x='200'%3E💬%3C/text%3E%3C/svg%3E");opacity:.4;pointer-events:none;}
+.c-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);gap:14px;position:relative;z-index:1;}
+.c-empty-icon{width:80px;height:80px;border-radius:50%;background:#1f2c34;display:flex;align-items:center;justify-content:center;font-size:36px;opacity:.4;}
+.c-empty h3{font-size:22px;font-weight:300;color:#aebac1;}
+.c-empty p{font-size:14px;}
+/* Header do chat */
+.c-head{background:var(--panel);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;position:relative;z-index:1;}
+.c-head-av{width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;}
+.c-head-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.c-head-info{flex:1;}
+.c-head-name{font-size:15px;font-weight:600;}
+.c-head-sub{font-size:12px;color:var(--sub);margin-top:1px;}
+.c-head-btns{display:flex;gap:4px;}
+.chbtn{background:none;border:1px solid;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;transition:all .18s;}
+.chbtn.green{border-color:var(--green);color:var(--green);}
+.chbtn.green:hover{background:var(--green);color:#fff;}
+.chbtn.blue{border-color:var(--blue);color:#60a5fa;}
+.chbtn.blue:hover{background:var(--blue);color:#fff;}
+.chbtn.orange{border-color:var(--orange);color:var(--orange);}
+.chbtn.orange:hover{background:var(--orange);color:#fff;}
+.chbtn:disabled{border-color:var(--border);color:var(--sub);cursor:not-allowed;background:none;}
+/* Mensagens */
+.msgs{flex:1;overflow-y:auto;padding:12px 8%;display:flex;flex-direction:column;gap:2px;position:relative;z-index:1;}
+.msgs::-webkit-scrollbar{width:5px;}
+.msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.dsep{text-align:center;margin:10px 0;}
+.dsep span{background:#182229;color:var(--sub);font-size:11px;padding:5px 12px;border-radius:8px;}
+.trev{text-align:center;margin:6px 0;}
+.trev span{background:#1a2530;color:var(--sub);font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);}
+.brow{display:flex;margin-bottom:1px;}
+.brow.out{justify-content:flex-end;}
+.brow.in{justify-content:flex-start;}
+.bub{max-width:65%;padding:7px 10px 4px;border-radius:8px;font-size:14px;line-height:1.55;word-break:break-word;position:relative;}
+.bub.in{background:#202c33;border-radius:0 8px 8px 8px;}
+.bub.out{background:var(--out);border-radius:8px 0 8px 8px;}
+.bsender{font-size:11px;font-weight:600;margin-bottom:2px;}
+.bsender.al{color:#60a5fa;}.bsender.bot{color:#34d399;}.bsender.at{color:#f59e0b;}
+.bmeta{display:flex;justify-content:flex-end;margin-top:3px;gap:4px;align-items:center;}
+.btime{font-size:10px;color:rgba(255,255,255,.35);}
+/* Bubble de áudio */
+.audio-bub{display:flex;align-items:center;gap:10px;min-width:220px;padding:4px 0;}
+.audio-bub .play-btn{width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all .18s;}
+.bub.in .play-btn{background:var(--green);}
+.bub.out .play-btn{background:rgba(255,255,255,.15);}
+.play-btn:hover{opacity:.85;}
+.audio-wave{flex:1;height:28px;display:flex;align-items:center;gap:2px;}
+.audio-wave span{display:inline-block;width:3px;border-radius:3px;background:rgba(255,255,255,.3);animation:none;}
+.audio-wave.playing span{animation:wavePulse 1s ease-in-out infinite;}
+.audio-wave span:nth-child(1){height:8px;animation-delay:0s;}
+.audio-wave span:nth-child(2){height:16px;animation-delay:.1s;}
+.audio-wave span:nth-child(3){height:24px;animation-delay:.2s;}
+.audio-wave span:nth-child(4){height:18px;animation-delay:.3s;}
+.audio-wave span:nth-child(5){height:12px;animation-delay:.4s;}
+.audio-wave span:nth-child(6){height:20px;animation-delay:.15s;}
+.audio-wave span:nth-child(7){height:14px;animation-delay:.25s;}
+.audio-wave span:nth-child(8){height:10px;animation-delay:.35s;}
+@keyframes wavePulse{0%,100%{transform:scaleY(1);opacity:.4;}50%{transform:scaleY(1.5);opacity:1;}}
+.audio-dur{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;}
+/* ── INPUT AREA ── */
+.c-input{background:var(--panel);border-top:1px solid var(--border);padding:10px 14px;display:flex;align-items:flex-end;gap:8px;flex-shrink:0;position:relative;z-index:1;}
+.c-textarea{flex:1;background:#2a3942;border:none;border-radius:12px;padding:10px 16px;color:var(--txt);font-size:14px;resize:none;outline:none;font-family:inherit;max-height:130px;line-height:1.5;min-height:44px;}
+.c-textarea::placeholder{color:var(--sub);}
+.c-send-btn{width:44px;height:44px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s;}
+.c-send-btn:hover{background:var(--green2);}
+.c-send-btn:disabled{background:var(--border);cursor:not-allowed;}
+/* Botão mic */
+.c-mic-btn{width:44px;height:44px;border-radius:50%;background:var(--hover);border:none;color:var(--sub);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;}
+.c-mic-btn:hover{background:var(--border);color:var(--txt);}
+/* ── GRAVADOR DE ÁUDIO ESTILO WHATSAPP ── */
+#rec-bar{display:none;align-items:center;gap:12px;background:var(--panel);border-top:1px solid var(--border);padding:10px 14px;flex-shrink:0;position:relative;z-index:1;}
+#rec-bar.show{display:flex;}
+.rec-cancel{width:40px;height:40px;border-radius:50%;background:#ef444422;border:1px solid var(--red);color:var(--red);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;}
+.rec-cancel:hover{background:var(--red);color:#fff;}
+.rec-center{flex:1;display:flex;align-items:center;gap:10px;}
+.rec-dot{width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0;animation:recBlink 1s step-start infinite;}
+@keyframes recBlink{0%,100%{opacity:1;}50%{opacity:0;}}
+.rec-time{font-size:15px;font-weight:600;color:var(--txt);min-width:46px;}
+.rec-wave{flex:1;height:32px;display:flex;align-items:center;gap:3px;overflow:hidden;}
+.rec-wave span{display:inline-block;width:3px;border-radius:3px;background:var(--green);transition:height .1s ease;}
+.rec-send-btn{width:50px;height:50px;border-radius:50%;background:var(--green);border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(0,168,132,.4);transition:all .18s;}
+.rec-send-btn:hover{background:var(--green2);transform:scale(1.05);}
+/* Encerrado */
+.c-closed{text-align:center;color:var(--sub);font-size:12px;padding:14px;background:var(--panel);border-top:1px solid var(--border);flex-shrink:0;}
+
+/* ── PAINEL CRM ── */
+.crm-panel{width:280px;background:var(--panel);border-left:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column;}
+.crm-panel::-webkit-scrollbar{width:4px;}
+.crm-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.crm-top{padding:14px 16px;border-bottom:1px solid var(--border);text-align:center;}
+.crm-av{width:60px;height:60px;border-radius:50%;margin:0 auto 10px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;}
+.crm-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.crm-name{font-size:15px;font-weight:600;margin-bottom:2px;}
+.crm-phone{font-size:12px;color:var(--sub);}
+.crm-sec{padding:12px 16px;border-bottom:1px solid var(--border);}
+.crm-sec-title{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:10px;}
+.crm-status{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+.crm-status.pend{background:#422006;color:#fbbf24;}
+.crm-status.em{background:#0f1f35;color:#93c5fd;}
+.crm-status.res{background:#052e16;color:#34d399;}
+.crm-row{display:flex;flex-direction:column;gap:2px;margin-bottom:10px;}
+.crm-row:last-child{margin-bottom:0;}
+.crm-lbl{font-size:11px;color:var(--sub);}
+.crm-val{font-size:13px;color:var(--txt);}
+/* Modal */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;display:flex;align-items:center;justify-content:center;}
+.modal-box{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:24px;width:420px;max-width:95vw;max-height:80vh;overflow-y:auto;}
+.modal-box h3{font-size:16px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
+.modal-close{background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer;}
+.modal-field{margin-bottom:14px;}
+.modal-field label{font-size:12px;color:var(--sub);display:block;margin-bottom:5px;}
+.modal-field select,.modal-field textarea{width:100%;background:#2a3942;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--txt);font-size:13px;outline:none;font-family:inherit;}
+.modal-field textarea{resize:vertical;min-height:60px;}
+.modal-btn{width:100%;padding:11px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;}
+.modal-btn.green{background:var(--green);color:#fff;}
+.modal-btn.red{background:#ef444422;border:1px solid var(--red);color:var(--red);}
+/* Dispositivos */
+.disp-card{background:var(--hover);border-radius:8px;padding:12px;margin-bottom:10px;}
+.disp-user{font-size:13px;font-weight:600;margin-bottom:8px;}
+.disp-slot-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;}
+.disp-tag{font-size:10px;padding:2px 8px;border-radius:10px;flex-shrink:0;margin-top:1px;}
+.disp-tag.p{background:#3b82f622;color:#3b82f6;}
+.disp-tag.s{background:#8b5cf622;color:#a78bfa;}
+.disp-data{flex:1;}
+.disp-dn{font-size:12px;color:var(--txt);}
+.disp-ds{font-size:11px;color:var(--sub);}
+.disp-rev{font-size:11px;padding:3px 8px;border-radius:6px;background:#ef444422;border:1px solid var(--red);color:var(--red);cursor:pointer;}
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(40px);background:#182229;border:1px solid var(--border);border-radius:12px;padding:11px 18px;font-size:13px;z-index:999;transition:all .3s;opacity:0;white-space:nowrap;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.toast.ok{border-color:var(--green);color:#34d399;}
+.toast.err{border-color:var(--red);color:#f87171;}
+/* Spinner */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg);}}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 </style>
 </head>
 <body>
 
-<div class="login-screen" id="loginScreen">
-  <div class="login-box">
-    <div class="login-logo">💬</div>
-    <div class="login-title">MPEPro Atendimentos</div>
-    <div class="login-sub">Entre com seu e-mail e senha</div>
-    <div class="login-field"><label>E-mail</label><input type="email" id="lemail" placeholder="seu@email.com" autocomplete="email"/></div>
-    <div class="login-field"><label>Senha</label><input type="password" id="lsenha" placeholder="••••••" autocomplete="current-password"/></div>
-    <button class="login-btn" id="lbtn" onclick="doLogin()">Entrar</button>
-    <div class="login-err" id="lerr"></div>
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="lbox">
+    <div class="llogo">💬</div>
+    <div class="ltitle">MPEPro CRM</div>
+    <div class="lsub">Atendimentos via WhatsApp</div>
+    <div class="lfield"><label>E-mail</label><input type="email" id="l-email" placeholder="seu@email.com" autocomplete="username"/></div>
+    <div class="lfield"><label>Senha</label><input type="password" id="l-senha" placeholder="••••••••" autocomplete="current-password"/></div>
+    <button class="lbtn" id="l-btn">Entrar</button>
+    <div class="lerr" id="l-err"></div>
   </div>
 </div>
 
-<div class="main" id="main">
+<!-- MAIN -->
+<div id="main">
+  <!-- SIDEBAR -->
   <div class="sidebar">
-    <div class="top">
-      <div class="logo" id="uAvatar">?</div>
-      <div class="top-info"><div class="top-nome" id="uNome">...</div><div class="top-funcao" id="uFuncao">...</div></div>
-      <div class="top-btns">
-        <div style="display:flex;align-items:center;gap:4px;background:#1a3a2a;border:1px solid var(--green);border-radius:20px;padding:3px 8px;font-size:11px;color:var(--green);">
-          <div style="width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;"></div>Ao vivo
-        </div>
-        <button class="icon-btn" onclick="reload()">↻</button>
-        <button class="icon-btn" id="btn-disp" onclick="abrirModalDispositivos()" title="Gerenciar dispositivos" style="display:none">📱</button>
-        <button class="icon-btn" onclick="logout()">⎋</button>
+    <div class="s-top">
+      <div class="s-avatar" id="s-av"></div>
+      <div style="flex:1;margin-left:10px;"><div id="s-nome" style="font-size:14px;font-weight:600;"></div><div id="s-funcao" style="font-size:11px;color:var(--sub);"></div></div>
+      <div class="s-top-right">
+        <div id="live-dot" style="display:flex;align-items:center;gap:5px;background:#1a3a2a;border:1px solid var(--green);border-radius:20px;padding:3px 9px;font-size:11px;color:var(--green);"><div style="width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;"></div>Ao vivo</div>
+        <button class="iBtn" onclick="reload()" title="Atualizar">↻</button>
+        <button class="iBtn" id="btn-disp" onclick="abrirDispositivos()" title="Dispositivos" style="display:none">📱</button>
+        <button class="iBtn" onclick="logout()" title="Sair">⎋</button>
       </div>
     </div>
-    <div class="stats">
-      <div class="sc at" id="sc0" onclick="setF('todos')"><div class="sn b" id="n0">0</div><div class="sl">Total</div></div>
-      <div class="sc" id="sc1" onclick="setF('pendente')"><div class="sn o" id="n1">0</div><div class="sl">Pendentes</div></div>
-      <div class="sc" id="sc2" onclick="setF('em_atendimento')"><div class="sn lb" id="n2">0</div><div class="sl">Em atend.</div></div>
-      <div class="sc" id="sc3" onclick="setF('resolvido')"><div class="sn g" id="n3">0</div><div class="sl">Resolvidos</div></div>
+    <div class="s-stats" id="s-stats">
+      <div class="sstat sel-all" data-f="todos" onclick="setFiltro('todos')"><div class="sstat-n" style="color:#60a5fa" id="n-total">0</div><div class="sstat-l">Total</div></div>
+      <div class="sstat" data-f="pendente" onclick="setFiltro('pendente')"><div class="sstat-n" style="color:var(--orange)" id="n-pend">0</div><div class="sstat-l">Pendentes</div></div>
+      <div class="sstat" data-f="em_atendimento" onclick="setFiltro('em_atendimento')"><div class="sstat-n" style="color:#93c5fd" id="n-em">0</div><div class="sstat-l">Em atend.</div></div>
+      <div class="sstat" data-f="resolvido" onclick="setFiltro('resolvido')"><div class="sstat-n" style="color:var(--green)" id="n-res">0</div><div class="sstat-l">Resolvidos</div></div>
     </div>
-    <div class="sw"><div class="sb"><span style="color:var(--sub)">🔍</span><input type="text" id="q" placeholder="Buscar..." oninput="render()"/></div></div>
-    <div class="list" id="list"><div class="empty">⏳ Carregando...</div></div>
+    <div class="s-search"><div class="s-search-inner">🔍 <input type="text" id="q" placeholder="Buscar conversa..."/></div></div>
+    <div class="s-list" id="s-list"><div class="empty" style="height:120px;display:flex;align-items:center;justify-content:center;color:var(--sub)">⏳ Carregando...</div></div>
   </div>
+
+  <!-- CHAT -->
   <div class="cpanel" id="cpanel">
-    <div class="cempty"><div class="bi">💬</div><h3>MPEPro Atendimentos</h3><p>Selecione uma conversa</p></div>
-  </div>
-  <div class="crm" id="crm"></div>
-</div>
-
-<div class="modal-bg" id="modalBg">
-  <div class="modal">
-    <h3>🔀 Transferir para</h3>
-    <div id="modalAtendentes"></div>
-    <input class="modal-motivo" id="modalMotivo" placeholder="Motivo da transferência (opcional)"/>
-    <div class="modal-btns">
-      <button class="modal-btn cancel" onclick="fecharModal()">Cancelar</button>
-      <button class="modal-btn confirm" id="modalConfirm" disabled onclick="confirmarTransferir()">Transferir</button>
+    <div class="c-empty" id="c-empty">
+      <div class="c-empty-icon">💬</div>
+      <h3>MPEPro Atendimentos</h3>
+      <p>Selecione uma conversa para começar</p>
+    </div>
+    <div id="c-chat" style="display:none;flex:1;display:none;flex-direction:column;">
+      <div class="c-head" id="c-head"></div>
+      <div class="msgs" id="msgs"></div>
+      <!-- Input normal -->
+      <div class="c-input" id="c-input">
+        <textarea class="c-textarea" id="ti" rows="1" placeholder="Responder no WhatsApp..."></textarea>
+        <button class="c-mic-btn" id="mic-btn" onclick="iniciarGravacao()" title="Gravar áudio">🎤</button>
+        <button class="c-send-btn" id="sb" onclick="send()">➤</button>
+      </div>
+      <!-- Barra de gravação estilo WhatsApp -->
+      <div id="rec-bar">
+        <button class="rec-cancel" onclick="cancelarGravacao()" title="Cancelar">✕</button>
+        <div class="rec-center">
+          <div class="rec-dot"></div>
+          <div class="rec-time" id="rec-time">0:00</div>
+          <div class="rec-wave" id="rec-wave"></div>
+        </div>
+        <button class="rec-send-btn" onclick="pararEEnviarGravacao()" title="Enviar áudio">➤</button>
+      </div>
+      <div class="c-closed" id="c-closed" style="display:none">✅ Atendimento encerrado</div>
     </div>
   </div>
+
+  <!-- CRM PANEL -->
+  <div class="crm-panel" id="crm-panel" style="display:none">
+    <div id="crm-content"></div>
+  </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- MODAL TRANSFERIR -->
+<div class="modal-ov" id="modal-transf" style="display:none" onclick="if(event.target===this)fecharModal('modal-transf')">
+  <div class="modal-box">
+    <h3>Transferir conversa <button class="modal-close" onclick="fecharModal('modal-transf')">✕</button></h3>
+    <div class="modal-field"><label>Transferir para</label><select id="transf-dest"></select></div>
+    <div class="modal-field"><label>Motivo (opcional)</label><textarea id="transf-motivo" placeholder="Descreva o motivo..."></textarea></div>
+    <button class="modal-btn green" onclick="confirmarTransferencia()">Transferir</button>
+  </div>
+</div>
+
+<!-- MODAL DISPOSITIVOS -->
+<div class="modal-ov" id="modal-disp" style="display:none" onclick="if(event.target===this)fecharModal('modal-disp')">
+  <div class="modal-box">
+    <h3>📱 Dispositivos <button class="modal-close" onclick="fecharModal('modal-disp')">✕</button></h3>
+    <div id="disp-content">Carregando...</div>
+  </div>
+</div>
 
 <script>
 var API = 'https://jhon-a2f274aa.base44.app/functions/crmAuth';
-var token = '';
-var eu = null;
-var all = [], atendentes = [], fil = 'todos', selId = null, sending = false, transId = null, transDest = null;
+var all = [], filtro = 'todos', selId = null, eu = null, token = null, atendentes = [];
+var sending = false;
 
-// Carrega sessão salva
-try {
-  token = localStorage.getItem('crm_token') || '';
-  eu = JSON.parse(localStorage.getItem('crm_eu') || 'null');
-} catch(e) { token = ''; eu = null; }
-
+// ── UTILS ──────────────────────────────────────────────
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function renderBubble(msg, nomeAluno) {
-  var isOut = msg.tipo === 'enviada';
-  var subtipo = msg.subtipo || 'texto';
-  var conteudo = '';
-  
-  if (subtipo === 'audio') {
-    // Renderiza player de áudio
-    var src = msg.texto;
-    if (src && !src.startsWith('data:') && !src.startsWith('http')) {
-      src = 'data:audio/ogg;base64,' + src;
-    }
-    if (src && src.startsWith('http')) {
-      conteudo = '<audio controls style="max-width:220px;height:36px"><source src="'+src+'">Áudio não suportado</audio>';
-    } else if (src && src.length > 10) {
-      conteudo = '<audio controls style="max-width:220px;height:36px"><source src="'+src+'">Áudio não suportado</audio>';
-    } else {
-      conteudo = '🎤 <em style="color:var(--sub)">Áudio</em>';
-    }
-  } else if (subtipo === 'imagem') {
-    conteudo = renderMsg(msg.texto);
-  } else {
-    conteudo = esc(msg.texto||'');
-  }
-  
-  var sender = isOut ? (msg.de||'Atendente') : (msg.de||nomeAluno||'Aluno');
-  var senderClass = isOut ? (msg.de==='Bot'?'bot':'at') : 'al';
-  var senderIcon = isOut ? (msg.de==='Bot'?'🤖':'👤') : '👤';
-  
-  return '<div class="bw'+(isOut?' r':'')+'"><div class="bub '+(isOut?'out':'inc')+'">'
-    +'<div class="bsender '+senderClass+'">'+senderIcon+' '+esc(sender)+'</div>'
+function fmt(d){if(!d)return'';var dt=new Date(d),h=new Date();if(dt.toDateString()===h.toDateString())return dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});}
+function fmtFull(d){if(!d)return'—';return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});}
+function ini(n){if(!n)return'?';return n.split(' ').filter(Boolean).map(function(x){return x[0];}).slice(0,2).join('').toUpperCase();}
+function getSel(){return all.find(function(x){return x.id===selId;})||null;}
+function authH(){return{'Content-Type':'application/json','Authorization':'Bearer '+token};}
+function toast(msg,t){var e=document.getElementById('toast');e.textContent=(t==='err'?'❌ ':'✅ ')+msg;e.className='toast show '+(t==='err'?'err':'ok');clearTimeout(e._t);e._t=setTimeout(function(){e.className='toast';},3000);}
+
+// ── AVATAR ────────────────────────────────────────────
+function avColor(name){var colors=['#667eea','#f59e0b','#ef4444','#10b981','#3b82f6','#8b5cf6','#ec4899','#06b6d4'];var i=0;if(name)for(var c=0;c<name.length;c++)i+=name.charCodeAt(c);return colors[i%colors.length];}
+function avHTML(nome,foto,size){size=size||48;var bg=avColor(nome);if(foto&&foto.startsWith('http')){return'<div class="av" style="width:'+size+'px;height:'+size+'px;background:'+bg+'"><img src="'+foto+'" onerror="this.parentElement.innerHTML=\''+ini(nome)+'\'"/></div>';}return'<div class="av" style="width:'+size+'px;height:'+size+'px;background:'+bg+'">'+ini(nome)+'</div>';}
+
+// ── RENDERIZAR MENSAGEM ────────────────────────────────
+function renderMsg(txt){
+  if(!txt)return'';
+  var s=String(txt).trim();
+  if(s.startsWith('data:image/')){return'<img src="'+s+'" style="max-width:220px;border-radius:6px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
+  if(s.startsWith('/9j/')||s.startsWith('iVBOR')||s.startsWith('R0lG')){var m=s.startsWith('iVBOR')?'image/png':s.startsWith('R0lG')?'image/gif':'image/jpeg';return'<img src="data:'+m+';base64,'+s+'" style="max-width:220px;border-radius:6px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
+  if(s.length>500&&/^[A-Za-z0-9+\/]+=*$/.test(s.replace(/[\r\n]/g,''))){return'<img src="data:image/jpeg;base64,'+s+'" style="max-width:220px;border-radius:6px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
+  return esc(txt);
+}
+
+function renderAudio(txt,cls,idx){
+  var src=txt||'';
+  if(src&&!src.startsWith('data:')&&!src.startsWith('http')&&src.length>10){src='data:audio/ogg;base64,'+src;}
+  var waveId='w'+idx,audioId='a'+idx;
+  var wave='<div class="audio-wave" id="'+waveId+'"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>';
+  var html='<div class="audio-bub">'
+    +'<button class="play-btn" id="pb'+idx+'" onclick="toggleAudio(\''+audioId+'\',\''+waveId+'\',\'pb'+idx+'\')" aria-label="Play">▶</button>'
+    +wave
+    +'<span class="audio-dur" id="dur'+idx+'">0:00</span>'
+    +'</div>'
+    +'<audio id="'+audioId+'" preload="metadata" style="display:none">'
+    +(src.startsWith('http')||src.startsWith('data:')?'<source src="'+src+'">':'')
+    +'</audio>';
+  return html;
+}
+
+var audioCounter=0;
+function renderBubble(msg,nomeAluno,idx){
+  var isOut=msg.tipo==='enviada';
+  var sub=msg.subtipo||'texto';
+  var conteudo='';
+  if(sub==='audio'){conteudo=renderAudio(msg.texto,isOut?'out':'in',idx);}
+  else if(sub==='imagem'){conteudo=renderMsg(msg.texto);}
+  else{conteudo=renderMsg(msg.texto||'');}
+  var sender=isOut?(msg.de||'Atendente'):(msg.de||nomeAluno||'Aluno');
+  var sCls=isOut?(msg.de==='Bot'?'bot':'at'):'al';
+  return '<div class="brow '+(isOut?'out':'in')+'">'
+    +'<div class="bub '+(isOut?'out':'in')+'">'
+    +'<div class="bsender '+sCls+'">'+esc(sender)+'</div>'
     +conteudo
     +'<div class="bmeta"><span class="btime">'+fmt(msg.data)+'</span></div>'
     +'</div></div>';
 }
 
-function renderMsg(txt){
-  if(!txt)return '';
-  var s=String(txt).trim();
-  // data:image/... direto
-  if(s.startsWith('data:image/')){
-    return '<img src="'+s+'" style="max-width:100%;max-height:260px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" />';
+function toggleAudio(audioId,waveId,btnId){
+  var audio=document.getElementById(audioId);
+  var wave=document.getElementById(waveId);
+  var btn=document.getElementById(btnId);
+  if(!audio)return;
+  if(audio.paused){
+    // Para todos os outros áudios
+    document.querySelectorAll('audio').forEach(function(a){if(a!==audio&&!a.paused){a.pause();a.currentTime=0;}});
+    document.querySelectorAll('.audio-wave').forEach(function(w){w.classList.remove('playing');});
+    document.querySelectorAll('.play-btn').forEach(function(b){b.textContent='▶';});
+    audio.play().catch(function(){});
+    if(wave)wave.classList.add('playing');
+    if(btn)btn.textContent='⏸';
+    audio.onended=function(){if(wave)wave.classList.remove('playing');if(btn)btn.textContent='▶';};
+    audio.ontimeupdate=function(){
+      var dur=document.getElementById(waveId.replace('w','dur'));
+      if(dur){var t=audio.currentTime;var m=Math.floor(t/60);var s=Math.floor(t%60);dur.textContent=m+':'+(s<10?'0':'')+s;}
+    };
+  }else{
+    audio.pause();
+    if(wave)wave.classList.remove('playing');
+    if(btn)btn.textContent='▶';
   }
-  // Base64 JPEG (/9j/...), PNG (iVBOR...), GIF (R0lG...)
-  if(s.startsWith('/9j/')||s.startsWith('iVBOR')||s.startsWith('R0lG')||s.startsWith('UklG')){
-    var mime=s.startsWith('iVBOR')?'image/png':s.startsWith('R0lG')?'image/gif':'image/jpeg';
-    return '<img src="data:'+mime+';base64,'+s.replace(/\s/g,'')+'" style="max-width:100%;max-height:260px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" />';
-  }
-  // Base64 puro longo sem espaços
-  if(s.length>500&&/^[A-Za-z0-9+\/]+=*$/.test(s.replace(/[\r\n]/g,''))){
-    return '<img src="data:image/jpeg;base64,'+s.replace(/[\r\n]/g,'')+'" style="max-width:100%;max-height:260px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" />';
-  }
-  return esc(txt);
 }
-function ini(n){if(!n)return '?';return n.split(' ').filter(Boolean).map(function(x){return x[0];}).slice(0,2).join('').toUpperCase();}
-function fmt(d){if(!d)return '';var dt=new Date(d),h=new Date();if(dt.toDateString()===h.toDateString())return dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});}
-function fmtFull(d){if(!d)return '';return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});}
-function getSel(){return all.find(function(x){return x.id===selId;})||null;}
-function toast(m,t){var e=document.getElementById('toast');e.textContent=(t==='e'?'❌ ':'✅ ')+m;e.className='toast show '+(t==='e'?'e':'s');setTimeout(function(){e.className='toast';},3500);}
-function avatarHtml(nome,foto){if(foto)return '<img src="'+esc(foto)+'" onerror="this.style.display=\'none\'" />';return ini(nome);}
-function tagHtml(et,cor){if(!et)return '';var bg=cor?cor+'33':'#33333388',tc=cor||'#aaa';return '<span class="tag-chip" style="background:'+bg+';color:'+tc+';border:1px solid '+tc+'50">🏷️ '+esc(et)+'</span>';}
-function statusLabel(s){return s==='pendente'?'⏳ Pendente':s==='em_atendimento'?'🔵 Em atend.':'✅ Resolvido';}
-function badgeClass(s){return s==='pendente'?'bp':s==='em_atendimento'?'be':'brv';}
-function dotColor(s){return s==='pendente'?'var(--orange)':s==='em_atendimento'?'#60a5fa':'var(--green)';}
-function authH(){return {'Content-Type':'application/json','Authorization':'Bearer '+token};}
 
-function doLogin() {
-  var email = document.getElementById('lemail').value.trim();
-  var senha = document.getElementById('lsenha').value;
-  var btn = document.getElementById('lbtn');
-  var errEl = document.getElementById('lerr');
-  if (!email || !senha) { errEl.textContent = 'Preencha e-mail e senha'; return; }
-  btn.textContent = 'Entrando...';
-  btn.disabled = true;
-  errEl.textContent = '';
-  fetch(API + '?action=login', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({email: email, senha: senha})
-  }).then(function(r) {
-    return r.text();
-  }).then(function(txt) {
-    var d;
-    try { d = JSON.parse(txt); } catch(e) { throw new Error('Resposta inválida: ' + txt.slice(0,100)); }
-    if (d.error) throw new Error(d.error);
-    if (!d.token) throw new Error('Token não recebido');
-    token = d.token;
-    eu = d.atendente;
-    try { localStorage.setItem('crm_token', token); localStorage.setItem('crm_eu', JSON.stringify(eu)); localStorage.setItem('crm_slot', d.slot||'principal'); localStorage.setItem('crm_disp', d.dispositivo||window._nomeDisp||''); } catch(e) {}
-    mostrarApp(); mostrarBtnDispositivos();
-  }).catch(function(e) {
-    errEl.textContent = e.message || 'Erro de conexão';
-    btn.textContent = 'Entrar';
-    btn.disabled = false;
+// ── HISTÓRICO ─────────────────────────────────────────
+function renderHistorico(a){
+  var msgs=[];
+  try{msgs=JSON.parse(a.mensagens||'[]');}catch(e){}
+  if(!msgs||msgs.length===0){
+    var html='';
+    if(a.mensagem){html+='<div class="brow in"><div class="bub in"><div class="bsender al">'+esc(a.nome_aluno||'Aluno')+'</div>'+renderMsg(a.mensagem)+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>';}
+    if(a.resposta){html+='<div class="brow out"><div class="bub out"><div class="bsender '+(a.atendente_nome?'at':'bot')+'">'+esc(a.atendente_nome||'Bot')+'</div>'+esc(a.resposta)+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>';}
+    return html||'<div style="text-align:center;color:var(--sub);margin-top:20px;font-size:13px;">Sem mensagens</div>';
+  }
+  return msgs.map(function(m,i){return renderBubble(m,a.nome_aluno,i);}).join('');
+}
+
+// ── LISTA SIDEBAR ─────────────────────────────────────
+function setFiltro(f){
+  filtro=f;
+  document.querySelectorAll('.sstat').forEach(function(el){
+    var df=el.getAttribute('data-f');
+    el.className='sstat'+(df===f?' sel-'+({'todos':'all','pendente':'pend','em_atendimento':'em','resolvido':'res'}[f]||'all'):'');
   });
-}
-
-document.getElementById('lsenha').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
-
-function mostrarApp() {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('main').style.display = 'flex';
-  document.getElementById('uNome').textContent = eu.nome || '';
-  document.getElementById('uFuncao').textContent = eu.funcao || '';
-  var av = document.getElementById('uAvatar');
-  av.textContent = ini(eu.nome);
-  av.style.background = eu.cor || '#667eea';
-  carregarAtendentes();
-  reload();
-}
-
-function logout() {
-  try { localStorage.removeItem('crm_token'); localStorage.removeItem('crm_eu'); } catch(e){}
-  token = ''; eu = null; all = []; selId = null;
-  document.getElementById('main').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('lbtn').textContent = 'Entrar';
-  document.getElementById('lbtn').disabled = false;
-}
-
-function carregarAtendentes() {
-  fetch(API + '?action=atendentes', {headers: authH()}).then(function(r){return r.json();}).then(function(d){if(Array.isArray(d)) atendentes=d;}).catch(function(){});
-}
-
-function updateStats() {
-  document.getElementById('n0').textContent = all.length;
-  document.getElementById('n1').textContent = all.filter(function(x){return x.status==='pendente';}).length;
-  document.getElementById('n2').textContent = all.filter(function(x){return x.status==='em_atendimento';}).length;
-  document.getElementById('n3').textContent = all.filter(function(x){return x.status==='resolvido';}).length;
-}
-
-function setF(f) {
-  fil = f;
-  var fs = ['todos','pendente','em_atendimento','resolvido'];
-  var cls = ['at','ap','ae','ar'];
-  for(var i=0;i<4;i++) document.getElementById('sc'+i).className='sc'+(f===fs[i]?' '+cls[i]:'');
   render();
 }
-
-function render() {
-  var q = (document.getElementById('q').value||'').toLowerCase();
-  var lst = all.filter(function(a){
-    return (fil==='todos'||a.status===fil) && (!q||(a.nome_aluno||'').toLowerCase().indexOf(q)>=0||(a.mensagem||'').toLowerCase().indexOf(q)>=0||(a.numero_aluno||'').indexOf(q)>=0);
+function render(){
+  var q=(document.getElementById('q').value||'').toLowerCase();
+  var lst=all.filter(function(a){
+    if(filtro!=='todos'&&a.status!==filtro)return false;
+    if(q&&!(a.nome_aluno||'').toLowerCase().includes(q)&&!(a.mensagem||'').toLowerCase().includes(q)&&!(a.numero_aluno||'').includes(q))return false;
+    return true;
   });
-  var el = document.getElementById('list');
-  if (!lst.length) { el.innerHTML='<div class="empty">Nenhuma conversa</div>'; return; }
-  el.innerHTML = lst.map(function(a){
-    return '<div class="ci'+(a.id===selId?' active':'')+'" onclick="sel(\''+a.id+'\')">'
-      +'<div class="av-wrap"><div class="av">'+avatarHtml(a.nome_aluno,a.foto)+'</div>'
-      +'<div class="udot" style="background:'+dotColor(a.status)+'"></div></div>'
-      +'<div class="cb">'
-      +'<div class="r1"><span class="cn">'+esc(a.nome_aluno||'?')+'</span><span class="ct">'+fmt(a.data_contato)+'</span></div>'
-      +'<div class="r2"><span class="cp">'+renderMsg(a.mensagem||'')+'</span><span class="badge '+badgeClass(a.status)+'">'+statusLabel(a.status)+'</span></div>'
-      +(a.etiquetas?'<div>'+tagHtml(a.etiquetas,a.etiqueta_cor)+'</div>':'')
-      +(a.atendente_nome?'<div class="atbadge">👤 '+esc(a.atendente_nome)+'</div>':'')
+  var el=document.getElementById('s-list');
+  if(!lst.length){el.innerHTML='<div class="empty" style="height:120px;display:flex;align-items:center;justify-content:center;color:var(--sub)">🔍 Nenhum resultado</div>';return;}
+  el.innerHTML=lst.map(function(a){
+    var st=a.status;
+    var badgeCls=st==='pendente'?'pend':st==='em_atendimento'?'em':'res';
+    var badgeTxt=st==='pendente'?'Pendente':st==='em_atendimento'?'Em atend.':'Resolvido';
+    var dotCls=st==='pendente'?'pend':st==='em_atendimento'?'em':'';
+    var avBg=avColor(a.nome_aluno);
+    var avContent=a.foto&&a.foto.startsWith('http')?'<img src="'+a.foto+'" onerror="this.style.display=\'none\'"/>':ini(a.nome_aluno);
+    return '<div class="ci'+(a.id===selId?' active':'')+'" data-id="'+a.id+'">'
+      +'<div class="ci-av"><div class="av" style="background:'+avBg+'">'+avContent+'</div>'+(dotCls?'<div class="udot '+dotCls+'"></div>':'')+'</div>'
+      +'<div class="ci-body">'
+        +'<div class="ci-row1"><span class="ci-name">'+esc(a.nome_aluno||'Desconhecido')+'</span><span class="ci-time">'+fmt(a.data_contato)+'</span></div>'
+        +'<div class="ci-row2"><span class="ci-msg">'+(a.mensagem?esc(a.mensagem.slice(0,45)):'...')+'</span><span class="badge '+badgeCls+'">'+badgeTxt+'</span></div>'
+        +(a.atendente_nome?'<div class="ci-at">👤 '+esc(a.atendente_nome)+'</div>':'')
       +'</div></div>';
   }).join('');
+  el.querySelectorAll('.ci').forEach(function(el){el.addEventListener('click',function(){selecionar(el.getAttribute('data-id'));});});
 }
 
-function sel(id) { selId=id; render(); var a=getSel(); if(a){renderChat(a);renderCRM(a);} }
-
-function renderHistorico(a) {
-  var msgs = [];
-  try { msgs = JSON.parse(a.mensagens || '[]'); } catch(e) {}
-  
-  // Se não tem histórico, usa os campos legados
-  if (!msgs || msgs.length === 0) {
-    var html = '';
-    if (a.mensagem) {
-      html += '<div class="bw"><div class="bub inc"><div class="bsender al">👤 '+esc(a.nome_aluno||'Aluno')+'</div>'+renderMsg(a.mensagem)+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>';
-    }
-    if (a.resposta) {
-      html += '<div class="bw r"><div class="bub out"><div class="bsender '+(a.atendente_nome?'at':'bot')+'">'+esc(a.atendente_nome||'🤖 Bot')+'</div>'+esc(a.resposta)+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>';
-    }
-    return html || '<div class="empty">Sem mensagens</div>';
-  }
-  
-  return msgs.map(function(m) { return renderBubble(m, a.nome_aluno); }).join('');
+function updateStats(){
+  document.getElementById('n-total').textContent=all.length;
+  document.getElementById('n-pend').textContent=all.filter(function(a){return a.status==='pendente';}).length;
+  document.getElementById('n-em').textContent=all.filter(function(a){return a.status==='em_atendimento';}).length;
+  document.getElementById('n-res').textContent=all.filter(function(a){return a.status==='resolvido';}).length;
 }
 
-function renderChat(a) {
-  var pend=a.status==='pendente', emAt=a.status==='em_atendimento';
-  var minhaVez = (emAt && a.atendente_id===eu.id) || eu.funcao==='Administrador';
-  var historico = [];
-  try{historico=JSON.parse(a.historico_transferencias||'[]');}catch(e){}
-  var botoes = '';
-  if (pend) botoes += '<button class="hbtn azul" onclick="assumir(\''+a.id+'\')">🙋 Assumir</button>';
-  if (minhaVez && a.status!=='resolvido') {
-    botoes += '<button class="hbtn laranja" onclick="abrirTransferir(\''+a.id+'\')">🔀 Transferir</button>';
-    botoes += '<button class="hbtn verde" onclick="resolver()">✅ Resolver</button>';
-  }
-  if (a.status==='resolvido') botoes = '<button class="hbtn verde" disabled>✅ Resolvido</button>';
-  var transferEvs = historico.map(function(h){
-    return '<div class="transfer-ev"><span>🔀 '+esc(h.de)+' → '+esc(h.para)+(h.motivo?' · '+esc(h.motivo):'')+' · '+fmt(h.data)+'</span></div>';
-  }).join('');
-  var p = document.getElementById('cpanel');
-  p.innerHTML =
-    '<div class="ch">'
-    +'<div class="chav">'+avatarHtml(a.nome_aluno,a.foto)+'</div>'
-    +'<div class="chi"><div class="chn">'+esc(a.nome_aluno||'?')+'</div>'
-    +'<div class="chs">📞 '+esc(a.numero_aluno)+(a.etiquetas?' '+tagHtml(a.etiquetas,a.etiqueta_cor):'')+'</div></div>'
-    +'<div class="ch-btns">'+botoes+'</div></div>'
-    +'<div class="msgs" id="msgs">'
-    +'<div class="dsep"><span>'+fmtFull(a.data_contato)+'</span></div>'
-    +renderHistorico(a)
-    +transferEvs+'</div>'
-    +(minhaVez
-      ?'<div class="cia"><textarea class="cta" id="ti" rows="1" placeholder="Responder via WhatsApp..." onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();send();}" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,120)+\'px\'"></textarea><button class="micbtn" id="micbtn" onclick="toggleMic()" title="Gravar áudio">🎤</button><button class="sndbtn" id="sb" onclick="send()">➤</button></div>'
-      :a.status==='resolvido'?'<div class="cc">✅ Resolvido por '+(a.atendente_nome||'Bot')+' em '+fmtFull(a.data_contato)+'</div>'
-      :'<div class="cc">⏳ Aguardando atendente assumir</div>');
-  var msgs=document.getElementById('msgs'); if(msgs) msgs.scrollTop=msgs.scrollHeight;
+// ── SELECIONAR CONVERSA ───────────────────────────────
+function selecionar(id){
+  selId=id;
+  render();
+  var a=getSel();
+  if(!a)return;
+  document.getElementById('c-empty').style.display='none';
+  var chat=document.getElementById('c-chat');
+  chat.style.display='flex';
+  chat.style.flexDirection='column';
+  chat.style.flex='1';
+  renderHead(a);
+  renderMsgs(a);
+  renderCRM(a);
+  document.getElementById('crm-panel').style.display='flex';
+  document.getElementById('crm-panel').style.flexDirection='column';
 }
 
-function renderCRM(a) {
-  var crm=document.getElementById('crm');
-  crm.classList.add('show');
-  var historico=[];try{historico=JSON.parse(a.historico_transferencias||'[]');}catch(e){}
-  crm.innerHTML=
-    '<div class="crm-h">📋 Ficha</div>'
-    +'<div class="crm-sec" style="text-align:center;padding-top:16px">'
-    +'<div class="crm-avatar">'+avatarHtml(a.nome_aluno,a.foto)+'</div>'
-    +'<div style="font-size:15px;font-weight:600;margin-bottom:3px">'+esc(a.nome_aluno||'?')+'</div>'
-    +'<div style="font-size:11px;color:var(--sub);margin-bottom:7px">'+esc(a.numero_aluno||'')+'</div>'
-    +(a.etiquetas?tagHtml(a.etiquetas,a.etiqueta_cor):'<span style="font-size:11px;color:var(--sub)">Sem etiqueta</span>')+'</div>'
-    +'<div class="crm-sec"><div class="crm-t">Status</div><span class="cst '+a.status+'">'+statusLabel(a.status)+'</span></div>'
-    +'<div class="crm-sec"><div class="crm-t">Atendente</div>'
-    +(a.atendente_nome?'<div class="at-chip"><div class="at-dot" style="background:'+(atendentes.find(function(x){return x.id===a.atendente_id;})||{cor:'#aaa'}).cor+'"></div>'+esc(a.atendente_nome)+'</div>':'<span style="font-size:12px;color:var(--sub)">Sem atendente</span>')+'</div>'
-    +'<div class="crm-sec"><div class="crm-t">Contato</div>'
-    +'<div class="cf"><label>Telefone</label><span>'+esc(a.numero_aluno||'—')+'</span></div>'
-    +'<div class="cf"><label>Último contato</label><span>'+fmtFull(a.data_contato)+'</span></div></div>'
-    +'<div class="crm-sec"><div class="crm-t">Conversa</div>'
-    +'<div class="cf"><label>Mensagem</label><span>'+renderMsg(a.mensagem||'—')+'</span></div>'
-    +'<div class="cf"><label>Resposta</label><span>'+esc(a.resposta||'—')+'</span></div></div>'
-    +(historico.length?'<div class="crm-sec"><div class="crm-t">Transferências ('+historico.length+')</div>'
-      +historico.map(function(h){return '<div class="cf"><label>'+fmtFull(h.data)+'</label><span>'+esc(h.de)+' → '+esc(h.para)+'</span></div>';}).join('')+'</div>':'');
+function renderHead(a){
+  var minhaVez=a.atendente_id===eu.id||eu.funcao==='Administrador';
+  var st=a.status;
+  var avBg=avColor(a.nome_aluno);
+  var avContent=a.foto&&a.foto.startsWith('http')?'<img src="'+a.foto+'" onerror="this.style.display=\'none\'"/>':ini(a.nome_aluno);
+  var btns='';
+  if(st==='pendente'){btns='<button class="chbtn orange" onclick="assumir()">Assumir</button>';}
+  if(st==='em_atendimento'&&minhaVez){btns='<button class="chbtn green" onclick="resolver()">✅ Resolver</button><button class="chbtn blue" onclick="abrirTransferencia()">↗ Transferir</button>';}
+  if(st==='resolvido'){btns='<button class="chbtn green" disabled>✅ Resolvido</button>';}
+  document.getElementById('c-head').innerHTML=
+    '<div class="c-head-av" style="background:'+avBg+'">'+avContent+'</div>'
+    +'<div class="c-head-info"><div class="c-head-name">'+esc(a.nome_aluno||'Desconhecido')+'</div><div class="c-head-sub">📞 '+esc(a.numero_aluno)+'</div></div>'
+    +'<div class="c-head-btns">'+btns+'</div>';
 }
 
-function assumir(id) {
-  fetch(API+'?action=assumir',{method:'POST',headers:authH(),body:JSON.stringify({id:id})})
-    .then(function(r){return r.json();}).then(function(d){if(d.ok){toast('Chamado assumido!');reload();}else toast(d.error||'Erro','e');}).catch(function(){toast('Erro','e');});
+function renderMsgs(a){
+  var el=document.getElementById('msgs');
+  el.innerHTML='<div class="dsep"><span>'+fmtFull(a.data_contato)+'</span></div>'+renderHistorico(a);
+  var hist=[];try{hist=JSON.parse(a.historico_transferencias||'[]');}catch(e){}
+  hist.forEach(function(h){el.innerHTML+='<div class="trev"><span>🔄 Transferido de '+esc(h.de)+' para '+esc(h.para)+(h.motivo?' — '+esc(h.motivo):'')+'</span></div>';});
+  el.scrollTop=el.scrollHeight;
+  // Input
+  var minhaVez=a.atendente_id===eu.id||eu.funcao==='Administrador';
+  var ativo=a.status!=='resolvido'&&minhaVez;
+  document.getElementById('c-input').style.display=ativo?'flex':'none';
+  document.getElementById('rec-bar').classList.remove('show');
+  document.getElementById('c-closed').style.display=ativo?'none':'block';
 }
 
-function resolver() {
+function renderCRM(a){
+  var st=a.status;
+  var stCls=st==='pendente'?'pend':st==='em_atendimento'?'em':'res';
+  var stTxt=st==='pendente'?'⏳ Pendente':st==='em_atendimento'?'🔵 Em atendimento':'✅ Resolvido';
+  var avBg=avColor(a.nome_aluno);
+  var avContent=a.foto&&a.foto.startsWith('http')?'<img src="'+a.foto+'" onerror="this.style.display=\'none\'"/>':ini(a.nome_aluno);
+  document.getElementById('crm-content').innerHTML=
+    '<div class="crm-top"><div class="crm-av" style="background:'+avBg+'">'+avContent+'</div>'
+    +'<div class="crm-name">'+esc(a.nome_aluno||'Desconhecido')+'</div>'
+    +'<div class="crm-phone">'+esc(a.numero_aluno)+'</div></div>'
+    +'<div class="crm-sec"><div class="crm-sec-title">Status</div><span class="crm-status '+stCls+'">'+stTxt+'</span></div>'
+    +'<div class="crm-sec"><div class="crm-sec-title">Atendente</div>'
+    +'<div class="crm-row"><div class="crm-val">'+(a.atendente_nome?'👤 '+esc(a.atendente_nome):'— Sem atendente')+'</div></div>'
+    +(a.atendente_funcao?'<div class="crm-row"><div class="crm-val" style="color:var(--sub);font-size:12px">'+esc(a.atendente_funcao)+'</div></div>':'')
+    +'</div>'
+    +'<div class="crm-sec"><div class="crm-sec-title">Contato</div>'
+    +'<div class="crm-row"><div class="crm-lbl">Telefone</div><div class="crm-val">'+esc(a.numero_aluno||'—')+'</div></div>'
+    +'<div class="crm-row"><div class="crm-lbl">Último contato</div><div class="crm-val">'+fmtFull(a.data_contato)+'</div></div>'
+    +'</div>'
+    +'<div class="crm-sec"><div class="crm-sec-title">Conversa</div>'
+    +'<div class="crm-row"><div class="crm-lbl">Mensagem</div><div class="crm-val">'+esc((a.mensagem||'').slice(0,80))+'</div></div>'
+    +'<div class="crm-row"><div class="crm-lbl">Resposta bot</div><div class="crm-val">'+esc((a.resposta||'—').slice(0,80))+'</div></div>'
+    +'</div>';
+}
+
+// ── AÇÕES ─────────────────────────────────────────────
+function assumir(){
+  var a=getSel();if(!a)return;
+  fetch(API+'?action=assumir',{method:'POST',headers:authH(),body:JSON.stringify({id:a.id})})
+    .then(function(r){return r.json();}).then(function(d){
+      if(d.ok){toast('Atendimento assumido!');a.status='em_atendimento';a.atendente_id=eu.id;a.atendente_nome=eu.nome;a.atendente_funcao=eu.funcao;updateStats();render();renderHead(a);renderMsgs(a);renderCRM(a);}
+      else toast(d.error||'Erro','err');
+    });
+}
+function resolver(){
   var a=getSel();if(!a)return;
   fetch(API+'?action=resolver',{method:'POST',headers:authH(),body:JSON.stringify({id:a.id})})
-    .then(function(r){return r.json();}).then(function(d){if(d.ok){toast('Resolvido!');a.status='resolvido';updateStats();render();renderChat(a);renderCRM(a);}else toast(d.error||'Erro','e');}).catch(function(){toast('Erro','e');});
+    .then(function(r){return r.json();}).then(function(d){
+      if(d.ok){toast('Resolvido! ✅');a.status='resolvido';updateStats();render();renderHead(a);renderMsgs(a);renderCRM(a);}
+      else toast(d.error||'Erro','err');
+    });
 }
+function abrirTransferencia(){
+  var lista=atendentes.filter(function(at){return at.id!==eu.id;});
+  var sel=document.getElementById('transf-dest');
+  sel.innerHTML=lista.map(function(at){return'<option value="'+at.id+'">'+at.nome+' ('+at.funcao+')</option>';}).join('');
+  document.getElementById('transf-motivo').value='';
+  document.getElementById('modal-transf').style.display='flex';
+}
+function confirmarTransferencia(){
+  var a=getSel();if(!a)return;
+  var destId=document.getElementById('transf-dest').value;
+  var motivo=document.getElementById('transf-motivo').value;
+  var destAt=atendentes.find(function(at){return at.id===destId;});
+  if(!destAt)return;
+  fetch(API+'?action=transferir',{method:'POST',headers:authH(),body:JSON.stringify({id:a.id,atendente_destino_id:destId,atendente_destino_nome:destAt.nome,atendente_destino_funcao:destAt.funcao,motivo:motivo})})
+    .then(function(r){return r.json();}).then(function(d){
+      if(d.ok){toast('Transferido para '+destAt.nome+'!');fecharModal('modal-transf');reload();}
+      else toast(d.error||'Erro','err');
+    });
+}
+function fecharModal(id){document.getElementById(id).style.display='none';}
 
-function send() {
+// ── ENVIAR TEXTO ──────────────────────────────────────
+function send(){
   if(sending)return;
   var a=getSel();if(!a)return;
-  var inp=document.getElementById('ti'),msg=inp?inp.value.trim():'';
-  if(!msg){toast('Digite uma mensagem!','e');return;}
+  var inp=document.getElementById('ti'),msg=(inp?inp.value:'').trim();
+  if(!msg){toast('Digite uma mensagem!','err');return;}
   sending=true;
-  var sb=document.getElementById('sb');
-  if(sb){sb.disabled=true;sb.textContent='⏳';}
+  var btn=document.getElementById('sb');if(btn){btn.disabled=true;btn.innerHTML='<div class="spin"></div>';}
   fetch(API+'?action=responder',{method:'POST',headers:authH(),body:JSON.stringify({id:a.id,phone:a.numero_aluno,mensagem:msg})})
     .then(function(r){return r.json();}).then(function(d){
       if(d.ok){
         toast('Enviado! 📤');
-        // Registra a resposta localmente mas NÃO muda o status
-        a.resposta=msg;
         if(inp){inp.value='';inp.style.height='auto';}
-        render();
-        renderChat(a);
-        renderCRM(a);
-      } else {
-        toast('Erro: '+(d.error||'?'),'e');
-      }
-      sending=false;
-      if(sb){sb.disabled=false;sb.textContent='➤';}
-    }).catch(function(){toast('Erro','e');sending=false;if(sb){sb.disabled=false;sb.textContent='➤';}});
+        // Adiciona localmente
+        var hist=[];try{hist=JSON.parse(a.mensagens||'[]');}catch(e){}
+        hist.push({tipo:'enviada',subtipo:'texto',texto:msg,data:new Date().toISOString(),de:eu.nome});
+        a.mensagens=JSON.stringify(hist);a.resposta=msg;
+        renderMsgs(a);renderCRM(a);
+      }else toast(d.error||'Erro','err');
+    }).catch(function(){toast('Erro de conexão','err');})
+    .finally(function(){sending=false;if(btn){btn.disabled=false;btn.innerHTML='➤';}});
 }
 
-function abrirTransferir(id) {
-  transId=id;transDest=null;
-  var lista=atendentes.filter(function(a){return a.id!==eu.id;});
-  document.getElementById('modalAtendentes').innerHTML=lista.map(function(a){
-    return '<div class="modal-at" onclick="selecionarDest(this,\''+a.id+'\',\''+esc(a.nome)+'\',\''+esc(a.funcao)+'\')">'
-      +'<div class="modal-av" style="background:'+(a.cor||'#667eea')+'">'+esc(a.avatar_iniciais||ini(a.nome))+'</div>'
-      +'<div class="modal-info"><div class="modal-nome">'+esc(a.nome)+'</div><div class="modal-funcao">'+esc(a.funcao)+'</div></div></div>';
-  }).join('');
-  document.getElementById('modalMotivo').value='';
-  document.getElementById('modalConfirm').disabled=true;
-  document.getElementById('modalBg').classList.add('show');
+// ── GRAVAÇÃO DE ÁUDIO ESTILO WHATSAPP ─────────────────
+var mediaRec=null,audioChunks=[],gravando=false,recTimer=null,recSecs=0,animFrame=null;
+var audioContext=null,analyser=null,micStream=null;
+
+function iniciarGravacao(){
+  if(!navigator.mediaDevices){toast('Microfone não disponível','err');return;}
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    micStream=stream;
+    audioChunks=[];recSecs=0;
+    // Audio context para visualização
+    audioContext=new (window.AudioContext||window.webkitAudioContext)();
+    var src=audioContext.createMediaStreamSource(stream);
+    analyser=audioContext.createAnalyser();
+    analyser.fftSize=64;
+    src.connect(analyser);
+    // Inicia gravação
+    mediaRec=new MediaRecorder(stream);
+    mediaRec.ondataavailable=function(e){if(e.data.size>0)audioChunks.push(e.data);};
+    mediaRec.start(100);
+    gravando=true;
+    // Mostra barra de gravação
+    document.getElementById('c-input').style.display='none';
+    var bar=document.getElementById('rec-bar');bar.classList.add('show');
+    // Inicializa ondas
+    var wave=document.getElementById('rec-wave');
+    wave.innerHTML='';
+    for(var i=0;i<20;i++){var s=document.createElement('span');s.style.height='4px';wave.appendChild(s);}
+    // Timer
+    recTimer=setInterval(function(){
+      recSecs++;
+      var m=Math.floor(recSecs/60);var s=recSecs%60;
+      document.getElementById('rec-time').textContent=m+':'+(s<10?'0':'')+s;
+    },1000);
+    // Animação das ondas
+    animarOndas();
+  }).catch(function(e){toast('Erro ao acessar microfone: '+e.message,'err');});
 }
 
-function selecionarDest(el,id,nome,funcao) {
-  document.querySelectorAll('.modal-at').forEach(function(x){x.classList.remove('sel');});
-  el.classList.add('sel');
-  transDest={id:id,nome:nome,funcao:funcao};
-  document.getElementById('modalConfirm').disabled=false;
-}
-
-function fecharModal(){document.getElementById('modalBg').classList.remove('show');transId=null;transDest=null;}
-
-function confirmarTransferir() {
-  if(!transId||!transDest)return;
-  var btn=document.getElementById('modalConfirm');
-  btn.disabled=true;btn.textContent='Transferindo...';
-  var motivo=document.getElementById('modalMotivo').value.trim();
-  fetch(API+'?action=transferir',{method:'POST',headers:authH(),body:JSON.stringify({id:transId,atendente_destino_id:transDest.id,atendente_destino_nome:transDest.nome,atendente_destino_funcao:transDest.funcao,motivo:motivo})})
-    .then(function(r){return r.json();}).then(function(d){
-      if(d.ok){toast('Transferido para '+transDest.nome+'!');fecharModal();reload();}
-      else toast(d.error||'Erro','e');
-      btn.disabled=false;btn.textContent='Transferir';
-    }).catch(function(){toast('Erro','e');btn.disabled=false;btn.textContent='Transferir';});
-}
-
-function reload() {
-  if(!token)return;
-  fetch(API+'?action=list',{headers:authH()})
-    .then(function(r){if(r.status===401){logout();return null;}return r.json();})
-    .then(function(d){if(!d)return;if(Array.isArray(d)){all=d;updateStats();render();var a=getSel();if(a){renderChat(a);renderCRM(a);}}})
-    .catch(function(e){console.error('reload err',e);});
-}
-
-// Init
-if (token && eu) {
-  mostrarApp();
-} else {
-  document.getElementById('loginScreen').style.display = 'flex';
-}
-// ── GRAVAÇÃO DE ÁUDIO ──────────────────────────────────
-var mediaRec = null, audioChunks = [], gravando = false;
-
-function toggleMic() {
-  if (gravando) {
-    pararGravacao();
-  } else {
-    iniciarGravacao();
+function animarOndas(){
+  if(!gravando||!analyser)return;
+  var arr=new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(arr);
+  var wave=document.getElementById('rec-wave');
+  if(wave){
+    var spans=wave.querySelectorAll('span');
+    spans.forEach(function(s,i){
+      var v=arr[i]||0;
+      var h=Math.max(4,Math.min(28,(v/255)*28));
+      s.style.height=h+'px';
+    });
   }
+  animFrame=requestAnimationFrame(animarOndas);
 }
 
-function iniciarGravacao() {
-  if (!navigator.mediaDevices) { toast('Microfone não disponível','e'); return; }
-  navigator.mediaDevices.getUserMedia({audio: true}).then(function(stream) {
-    audioChunks = [];
-    mediaRec = new MediaRecorder(stream);
-    mediaRec.ondataavailable = function(e) { if(e.data.size>0) audioChunks.push(e.data); };
-    mediaRec.onstop = function() {
-      var blob = new Blob(audioChunks, {type:'audio/ogg; codecs=opus'});
-      var reader = new FileReader();
-      reader.onloadend = function() {
-        var base64 = reader.result.split(',')[1];
-        enviarAudio(base64);
+function cancelarGravacao(){
+  _pararGravacao();
+  toast('Gravação cancelada');
+}
+
+function pararEEnviarGravacao(){
+  if(!gravando)return;
+  if(mediaRec&&mediaRec.state!=='inactive'){
+    mediaRec.onstop=function(){
+      var blob=new Blob(audioChunks,{type:'audio/ogg; codecs=opus'});
+      var reader=new FileReader();
+      reader.onloadend=function(){
+        var base64=reader.result.split(',')[1];
+        _enviarAudio(base64);
       };
       reader.readAsDataURL(blob);
-      stream.getTracks().forEach(function(t){t.stop();});
     };
-    mediaRec.start();
-    gravando = true;
-    var btn = document.getElementById('micbtn');
-    if(btn) { btn.classList.add('gravando'); btn.textContent='⏹'; btn.title='Parar gravação'; }
-    toast('🎤 Gravando... clique para parar');
-  }).catch(function(e) { toast('Erro ao acessar microfone: '+e.message,'e'); });
+    mediaRec.stop();
+  }
+  _pararGravacao();
 }
 
-function pararGravacao() {
-  if (mediaRec && mediaRec.state !== 'inactive') mediaRec.stop();
-  gravando = false;
-  var btn = document.getElementById('micbtn');
-  if(btn) { btn.classList.remove('gravando'); btn.textContent='🎤'; btn.title='Gravar áudio'; }
+function _pararGravacao(){
+  gravando=false;
+  if(recTimer)clearInterval(recTimer);recTimer=null;
+  if(animFrame)cancelAnimationFrame(animFrame);animFrame=null;
+  if(mediaRec&&mediaRec.state!=='inactive')mediaRec.stop();
+  if(micStream)micStream.getTracks().forEach(function(t){t.stop();});
+  if(audioContext&&audioContext.state!=='closed')audioContext.close().catch(function(){});
+  audioContext=null;analyser=null;micStream=null;
+  document.getElementById('rec-bar').classList.remove('show');
+  var a=getSel();
+  if(a&&a.status!=='resolvido'&&(a.atendente_id===eu.id||eu.funcao==='Administrador')){
+    document.getElementById('c-input').style.display='flex';
+  }
+  document.getElementById('rec-time').textContent='0:00';
+  var wave=document.getElementById('rec-wave');if(wave)wave.innerHTML='';
 }
 
-function enviarAudio(base64) {
-  var a = getSel(); if(!a) return;
-  var btn = document.getElementById('micbtn');
-  if(btn) { btn.disabled=true; btn.textContent='⏳'; }
-  fetch(API+'?action=enviarAudio', {
-    method:'POST', headers:authH(),
-    body: JSON.stringify({id:a.id, phone:a.numero_aluno, audioBase64:base64})
-  }).then(function(r){return r.json();}).then(function(d){
-    if(d.ok){ toast('Áudio enviado! 🎤'); reload(); }
-    else toast('Erro: '+(d.error||'?'),'e');
-    if(btn){btn.disabled=false;btn.textContent='🎤';}
-  }).catch(function(){ toast('Erro','e'); if(btn){btn.disabled=false;btn.textContent='🎤';} });
+function _enviarAudio(base64){
+  var a=getSel();if(!a)return;
+  var btn=document.getElementById('mic-btn');if(btn){btn.disabled=true;btn.textContent='⏳';}
+  fetch(API+'?action=enviarAudio',{method:'POST',headers:authH(),body:JSON.stringify({id:a.id,phone:a.numero_aluno,audioBase64:base64})})
+    .then(function(r){return r.json();}).then(function(d){
+      if(d.ok){
+        toast('Áudio enviado! 🎤');
+        var hist=[];try{hist=JSON.parse(a.mensagens||'[]');}catch(e){}
+        hist.push({tipo:'enviada',subtipo:'audio',texto:base64,data:new Date().toISOString(),de:eu.nome});
+        a.mensagens=JSON.stringify(hist);
+        renderMsgs(a);
+      }else toast(d.error||'Erro','err');
+    }).catch(function(){toast('Erro de conexão','err');})
+    .finally(function(){if(btn){btn.disabled=false;btn.textContent='🎤';}});
 }
 
-setInterval(function(){if(token)reload();}, 20000);
-
-// ── MODAL DISPOSITIVOS ────────────────────────────────
-function mostrarBtnDispositivos() {
-  var btn = document.getElementById('btn-disp');
-  if (btn && eu && eu.funcao === 'Administrador') btn.style.display = '';
+// ── RELOAD ────────────────────────────────────────────
+async function reload(){
+  try{
+    var r=await fetch(API+'?action=list&t='+Date.now(),{headers:authH()});
+    if(r.status===401){logout();return;}
+    var d=await r.json();
+    if(Array.isArray(d)){
+      all=d;
+      updateStats();render();
+      var sel=getSel();if(sel){var novo=all.find(function(x){return x.id===selId;});if(novo){selId=novo.id;renderMsgs(novo);renderCRM(novo);}}
+    }
+  }catch(e){console.error(e);}
 }
 
-function abrirModalDispositivos() {
-  var modal = document.getElementById('modal-disp');
-  var content = document.getElementById('modal-disp-content');
-  if (!modal) return;
-  modal.style.display = 'flex';
-  content.innerHTML = 'Carregando...';
-  fetch(API + '?action=dispositivos', { headers: authH() })
-    .then(function(r){ return r.json(); })
-    .then(function(lista) {
-      if (!Array.isArray(lista)) { content.innerHTML = 'Erro ao carregar.'; return; }
-      var html = '';
-      lista.forEach(function(at) {
-        html += '<div class="disp-atendente">';
-        html += '<div class="disp-nome-at">' + esc(at.nome) + ' <span style="color:var(--sub);font-weight:400;font-size:11px">' + esc(at.funcao) + '</span></div>';
-        // Principal
-        html += '<div class="disp-row">';
-        html += '<span class="disp-slot p">Principal</span>';
-        if (at.dispositivo_principal) {
-          var dp = at.dispositivo_principal;
-          html += '<div class="disp-info"><div class="di-nome">💻 ' + esc(dp.nome||'?') + '</div>';
-          html += '<div class="di-sub">Registrado: ' + fmtFull(dp.registrado_em) + ' · Último acesso: ' + fmtFull(dp.ultimo_acesso) + '</div></div>';
-          html += '<button class="btn-rev" onclick="revogar('' + at.id + '','principal')">Revogar</button>';
-        } else {
-          html += '<div class="disp-info disp-vazio">Nenhum dispositivo registrado</div>';
-        }
-        html += '</div>';
-        // Secundário
-        html += '<div class="disp-row">';
-        html += '<span class="disp-slot s">Secundário</span>';
-        if (at.dispositivo_secundario) {
-          var ds = at.dispositivo_secundario;
-          html += '<div class="disp-info"><div class="di-nome">📱 ' + esc(ds.nome||'?') + '</div>';
-          html += '<div class="di-sub">Registrado: ' + fmtFull(ds.registrado_em) + ' · Último acesso: ' + fmtFull(ds.ultimo_acesso) + '</div></div>';
-          html += '<button class="btn-rev" onclick="revogar('' + at.id + '','secundario')">Revogar</button>';
-        } else {
-          html += '<div class="disp-info disp-vazio">Nenhum dispositivo secundário</div>';
-        }
-        html += '</div>';
-        // Botão revogar todos
-        if (at.dispositivo_principal || at.dispositivo_secundario) {
-          html += '<button class="btn-rev" onclick="revogar('' + at.id + '','ambos')" style="margin-top:4px">⚠️ Revogar todos</button>';
-        }
-        html += '</div>';
-      });
-      content.innerHTML = html || '<div class="disp-vazio">Nenhum atendente encontrado.</div>';
-    }).catch(function(e) { content.innerHTML = 'Erro: ' + e.message; });
+// ── LOGIN ─────────────────────────────────────────────
+function tentarLogin(){
+  var email=document.getElementById('l-email').value.trim();
+  var senha=document.getElementById('l-senha').value;
+  var errEl=document.getElementById('l-err');
+  var btn=document.getElementById('l-btn');
+  if(!email||!senha){errEl.textContent='Preencha todos os campos.';return;}
+  btn.disabled=true;btn.textContent='Entrando...';errEl.textContent='';
+  var fp=[navigator.userAgent,navigator.language,screen.width+'x'+screen.height,Intl.DateTimeFormat().resolvedOptions().timeZone].join('|');
+  var ua=navigator.userAgent;
+  var br=ua.includes('Chrome')?'Chrome':ua.includes('Firefox')?'Firefox':ua.includes('Safari')?'Safari':'Browser';
+  var os=ua.includes('Android')?'Android':(ua.includes('iPhone')||ua.includes('iPad'))?'iOS':ua.includes('Win')?'Windows':ua.includes('Mac')?'Mac':'Linux';
+  var nomeDisp=br+'/'+os;
+  fetch(API+'?action=login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,senha:senha,fingerprint:fp,nomeDispositivo:nomeDisp})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d.ok)throw new Error(d.error||'Erro');
+      token=d.token;eu=d.atendente;
+      try{localStorage.setItem('crm_token',token);localStorage.setItem('crm_eu',JSON.stringify(eu));localStorage.setItem('crm_slot',d.slot||'principal');localStorage.setItem('crm_disp',d.dispositivo||nomeDisp);}catch(e){}
+      entrar();
+    }).catch(function(e){errEl.textContent=e.message||'Erro de conexão';btn.disabled=false;btn.textContent='Entrar';});
 }
 
-function fecharModalDispositivos() {
-  var modal = document.getElementById('modal-disp');
-  if (modal) modal.style.display = 'none';
+function entrar(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main').className='show';
+  // Avatar
+  var avEl=document.getElementById('s-av');
+  avEl.style.background=avColor(eu.nome);
+  avEl.textContent=ini(eu.nome);
+  document.getElementById('s-nome').textContent=eu.nome||'';
+  document.getElementById('s-funcao').textContent=eu.funcao||'';
+  if(eu.funcao==='Administrador')document.getElementById('btn-disp').style.display='';
+  // Carrega atendentes e dados
+  fetch(API+'?action=atendentes',{headers:authH()}).then(function(r){return r.json();}).then(function(d){if(Array.isArray(d))atendentes=d;});
+  reload();
+  setInterval(function(){if(token)reload();},20000);
 }
 
-function revogar(atendenteId, slot) {
-  var label = slot === 'ambos' ? 'TODOS os dispositivos' : 'o dispositivo ' + slot;
-  if (!confirm('Revogar ' + label + ' deste atendente? Ele precisará fazer login novamente.')) return;
-  fetch(API + '?action=revogarDispositivo', {
-    method: 'POST', headers: authH(),
-    body: JSON.stringify({ atendente_id: atendenteId, slot: slot })
-  }).then(function(r){ return r.json(); }).then(function(d) {
-    if (d.ok) { toast('Dispositivo revogado ✅'); abrirModalDispositivos(); }
-    else toast('Erro: ' + (d.error||'?'), 'e');
-  }).catch(function(){ toast('Erro','e'); });
+function logout(){
+  token=null;eu=null;selId=null;all=[];
+  try{localStorage.removeItem('crm_token');localStorage.removeItem('crm_eu');}catch(e){}
+  document.getElementById('main').className='';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('l-senha').value='';
+  document.getElementById('l-err').textContent='';
 }
+
+// ── DISPOSITIVOS ──────────────────────────────────────
+function abrirDispositivos(){
+  document.getElementById('modal-disp').style.display='flex';
+  document.getElementById('disp-content').textContent='Carregando...';
+  fetch(API+'?action=dispositivos',{headers:authH()}).then(function(r){return r.json();}).then(function(lista){
+    if(!Array.isArray(lista)){document.getElementById('disp-content').textContent='Erro.';return;}
+    var html='';
+    lista.forEach(function(at){
+      html+='<div class="disp-card"><div class="disp-user">'+esc(at.nome)+' <span style="color:var(--sub);font-weight:400;font-size:11px">'+esc(at.funcao)+'</span></div>';
+      var dp=at.dispositivo_principal,ds=at.dispositivo_secundario;
+      html+='<div class="disp-slot-row"><span class="disp-tag p">Principal</span>';
+      if(dp){html+='<div class="disp-data"><div class="disp-dn">💻 '+esc(dp.nome||'?')+'</div><div class="disp-ds">Último: '+fmtFull(dp.ultimo_acesso)+'</div></div><button class="disp-rev" onclick="revogar(\''+at.id+'\',\'principal\')">Revogar</button>';}
+      else{html+='<div class="disp-data disp-ds" style="font-style:italic">Nenhum</div>';}
+      html+='</div>';
+      html+='<div class="disp-slot-row" style="margin-top:6px"><span class="disp-tag s">Secundário</span>';
+      if(ds){html+='<div class="disp-data"><div class="disp-dn">📱 '+esc(ds.nome||'?')+'</div><div class="disp-ds">Último: '+fmtFull(ds.ultimo_acesso)+'</div></div><button class="disp-rev" onclick="revogar(\''+at.id+'\',\'secundario\')">Revogar</button>';}
+      else{html+='<div class="disp-data disp-ds" style="font-style:italic">Nenhum</div>';}
+      html+='</div>';
+      if(dp||ds){html+='<button class="disp-rev" style="margin-top:8px;width:100%" onclick="revogar(\''+at.id+'\',\'ambos\')">⚠️ Revogar todos</button>';}
+      html+='</div>';
+    });
+    document.getElementById('disp-content').innerHTML=html||'<p style="color:var(--sub)">Nenhum atendente.</p>';
+  }).catch(function(e){document.getElementById('disp-content').textContent='Erro: '+e.message;});
+}
+function revogar(id,slot){
+  if(!confirm('Revogar dispositivo '+slot+'? O atendente precisará fazer login novamente.'))return;
+  fetch(API+'?action=revogarDispositivo',{method:'POST',headers:authH(),body:JSON.stringify({atendente_id:id,slot:slot})})
+    .then(function(r){return r.json();}).then(function(d){if(d.ok){toast('Revogado ✅');abrirDispositivos();}else toast(d.error,'err');});
+}
+
+// ── INIT ──────────────────────────────────────────────
+document.getElementById('l-btn').addEventListener('click',tentarLogin);
+document.getElementById('l-senha').addEventListener('keydown',function(e){if(e.key==='Enter')tentarLogin();});
+document.getElementById('l-email').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('l-senha').focus();});
+document.getElementById('q').addEventListener('input',render);
+document.getElementById('ti').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+document.getElementById('ti').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,130)+'px';});
+
+// Auto-login
+try{
+  var st=localStorage.getItem('crm_token');
+  var su=localStorage.getItem('crm_eu');
+  if(st&&su){token=st;eu=JSON.parse(su);entrar();}
+}catch(e){}
 </script>
-<div id="modal-disp" class="modal-overlay" style="display:none" onclick="if(event.target===this)fecharModalDispositivos()">
-  <div class="modal-box">
-    <button class="modal-close" onclick="fecharModalDispositivos()">✕</button>
-    <h3>📱 Gerenciar Dispositivos</h3>
-    <div id="modal-disp-content">Carregando...</div>
-  </div>
-</div>
 </body>
 </html>
