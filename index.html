@@ -181,6 +181,24 @@ try {
 } catch(e) { token = ''; eu = null; }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function renderMsg(txt){
+  if(!txt)return '';
+  var s=String(txt).trim();
+  // data:image/... direto
+  if(s.startsWith('data:image/')){
+    return '<img src="'+s+'" style="max-width:100%;max-height:260px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" />';
+  }
+  // Base64 JPEG (/9j/...), PNG (iVBOR...), GIF (R0lG...)
+  if(s.startsWith('/9j/')||s.startsWith('iVBOR')||s.startsWith('R0lG')||s.startsWith('UklG')){
+    var mime=s.startsWith('iVBOR')?'image/png':s.startsWith('R0lG')?'image/gif':'image/jpeg';
+    return '<img src="data:'+mime+';base64,'+s.replace(/\s/g,'')+'" style="max-width:100%;max-height:260px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" />';
+  }
+  // Base64 puro longo sem espaços
+  if(s.length>500&&/^[A-Za-z0-9+\/]+=*$/.test(s.replace(/[\r\n]/g,''))){
+    return '<img src="data:image/jpeg;base64,'+s.replace(/[\r\n]/g,'')+'" style="max-width:100%;max-height:260px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" />';
+  }
+  return esc(txt);
+}
 function ini(n){if(!n)return '?';return n.split(' ').filter(Boolean).map(function(x){return x[0];}).slice(0,2).join('').toUpperCase();}
 function fmt(d){if(!d)return '';var dt=new Date(d),h=new Date();if(dt.toDateString()===h.toDateString())return dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});}
 function fmtFull(d){if(!d)return '';return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});}
@@ -279,7 +297,7 @@ function render() {
       +'<div class="udot" style="background:'+dotColor(a.status)+'"></div></div>'
       +'<div class="cb">'
       +'<div class="r1"><span class="cn">'+esc(a.nome_aluno||'?')+'</span><span class="ct">'+fmt(a.data_contato)+'</span></div>'
-      +'<div class="r2"><span class="cp">'+esc(a.mensagem||'')+'</span><span class="badge '+badgeClass(a.status)+'">'+statusLabel(a.status)+'</span></div>'
+      +'<div class="r2"><span class="cp">'+renderMsg(a.mensagem||'')+'</span><span class="badge '+badgeClass(a.status)+'">'+statusLabel(a.status)+'</span></div>'
       +(a.etiquetas?'<div>'+tagHtml(a.etiquetas,a.etiqueta_cor)+'</div>':'')
       +(a.atendente_nome?'<div class="atbadge">👤 '+esc(a.atendente_nome)+'</div>':'')
       +'</div></div>';
@@ -312,7 +330,7 @@ function renderChat(a) {
     +'<div class="ch-btns">'+botoes+'</div></div>'
     +'<div class="msgs" id="msgs">'
     +'<div class="dsep"><span>'+fmtFull(a.data_contato)+'</span></div>'
-    +'<div class="bw"><div class="bub inc"><div class="bsender al">👤 '+esc(a.nome_aluno||'Aluno')+'</div>'+esc(a.mensagem||'')+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>'
+    +'<div class="bw"><div class="bub inc"><div class="bsender al">👤 '+esc(a.nome_aluno||'Aluno')+'</div>'+renderMsg(a.mensagem||'')+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>'
     +(a.resposta?'<div class="bw r"><div class="bub out"><div class="bsender '+(a.atendente_nome?'at':'bot')+'">'+esc(a.atendente_nome||'🤖 Bot')+'</div>'+esc(a.resposta)+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>':'')
     +transferEvs+'</div>'
     +(minhaVez
@@ -340,7 +358,7 @@ function renderCRM(a) {
     +'<div class="cf"><label>Telefone</label><span>'+esc(a.numero_aluno||'—')+'</span></div>'
     +'<div class="cf"><label>Último contato</label><span>'+fmtFull(a.data_contato)+'</span></div></div>'
     +'<div class="crm-sec"><div class="crm-t">Conversa</div>'
-    +'<div class="cf"><label>Mensagem</label><span>'+esc(a.mensagem||'—')+'</span></div>'
+    +'<div class="cf"><label>Mensagem</label><span>'+renderMsg(a.mensagem||'—')+'</span></div>'
     +'<div class="cf"><label>Resposta</label><span>'+esc(a.resposta||'—')+'</span></div></div>'
     +(historico.length?'<div class="crm-sec"><div class="crm-t">Transferências ('+historico.length+')</div>'
       +historico.map(function(h){return '<div class="cf"><label>'+fmtFull(h.data)+'</label><span>'+esc(h.de)+' → '+esc(h.para)+'</span></div>';}).join('')+'</div>':'');
