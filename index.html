@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>MPEPro CRM</title>
 <style>
 :root{
@@ -216,6 +216,94 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-seri
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg);}}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* ── MOBILE RESPONSIVO ── */
+@media (max-width: 768px) {
+  /* No mobile, sidebar e chat ocupam 100% individualmente */
+  #main { position: relative; overflow: hidden; }
+  
+  .sidebar {
+    width: 100% !important;
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    z-index: 10;
+    transition: transform 0.3s ease;
+  }
+  .sidebar.hidden-mobile {
+    transform: translateX(-100%);
+  }
+  
+  .cpanel {
+    width: 100% !important;
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    z-index: 5;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  .cpanel.show-mobile {
+    transform: translateX(0);
+    z-index: 15;
+  }
+  
+  .crm-panel {
+    display: none !important;
+  }
+  
+  /* Header mobile do chat com botão voltar */
+  .c-head { padding: 8px 12px; }
+  .c-head-back {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: var(--sub);
+    font-size: 22px;
+    cursor: pointer;
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
+  
+  /* Stats mais compactos */
+  .s-stats { padding: 6px 8px; gap: 4px; }
+  .sstat { padding: 6px 2px; }
+  .sstat-n { font-size: 15px; }
+  .sstat-l { font-size: 9px; }
+  
+  /* Top bar menor */
+  .s-top { padding: 8px 12px; height: 54px; }
+  
+  /* Lista items maiores para touch */
+  .ci { padding: 13px 14px; }
+  .av { width: 52px; height: 52px; font-size: 18px; }
+  .ci-name { font-size: 16px; }
+  .ci-msg { font-size: 13px; }
+  
+  /* Input área */
+  .c-input { padding: 8px 10px; gap: 6px; }
+  .c-textarea { font-size: 16px; } /* evita zoom no iOS */
+  
+  /* Mensagens com mais margem */
+  .msgs { padding: 10px 4%; }
+  .bub { max-width: 80%; }
+  
+  /* Botões no header do chat menores */
+  .c-head-btns { gap: 4px; }
+  .chbtn { padding: 5px 10px; font-size: 11px; }
+  
+  /* Painel direito do CRM esconde no mobile */
+  #crm-panel { display: none !important; }
+  
+  /* Live dot menor */
+  #live-dot { font-size: 10px; padding: 2px 7px; }
+}
+
+/* O botão voltar só aparece no mobile */
+.c-head-back { display: none; }
 </style>
 </head>
 <body>
@@ -498,6 +586,11 @@ function selecionar(id){
   renderCRM(a);
   document.getElementById('crm-panel').style.display='flex';
   document.getElementById('crm-panel').style.flexDirection='column';
+  // Mobile: esconde sidebar, mostra chat
+  if(window.innerWidth<=768){
+    document.querySelector('.sidebar').classList.add('hidden-mobile');
+    document.getElementById('cpanel').classList.add('show-mobile');
+  }
 }
 
 function renderHead(a){
@@ -510,7 +603,8 @@ function renderHead(a){
   if(st==='em_atendimento'&&minhaVez){btns='<button class="chbtn green" onclick="resolver()">✅ Resolver</button><button class="chbtn blue" onclick="abrirTransferencia()">↗ Transferir</button>';}
   if(st==='resolvido'){btns='<button class="chbtn green" disabled>✅ Resolvido</button>';}
   document.getElementById('c-head').innerHTML=
-    '<div class="c-head-av" style="background:'+avBg+'">'+avContent+'</div>'
+    '<button class="c-head-back" onclick="voltarParaLista()" title="Voltar">‹</button>'
+    +'<div class="c-head-av" style="background:'+avBg+'">'+avContent+'</div>'
     +'<div class="c-head-info"><div class="c-head-name">'+esc(a.nome_aluno||'Desconhecido')+'</div><div class="c-head-sub">📞 '+esc(a.numero_aluno)+'</div></div>'
     +'<div class="c-head-btns">'+btns+'</div>';
 }
@@ -555,6 +649,12 @@ function renderCRM(a){
 }
 
 // ── AÇÕES ─────────────────────────────────────────────
+function voltarParaLista(){
+  // Mobile: esconde chat, mostra sidebar
+  document.querySelector('.sidebar').classList.remove('hidden-mobile');
+  document.getElementById('cpanel').classList.remove('show-mobile');
+}
+
 function assumir(){
   var a=getSel();if(!a)return;
   fetch(API+'?action=assumir',{method:'POST',headers:authH(),body:JSON.stringify({id:a.id})})
@@ -778,6 +878,11 @@ function tentarLogin(){
 function entrar(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('main').className='show';
+  // Mobile: garante que começa na lista
+  if(window.innerWidth<=768){
+    document.querySelector('.sidebar').classList.remove('hidden-mobile');
+    document.getElementById('cpanel').classList.remove('show-mobile');
+  }
   // Avatar
   var avEl=document.getElementById('s-av');
   avEl.style.background=avColor(eu.nome);
