@@ -425,14 +425,14 @@ function renderMsg(txt){
   if(!txt)return'';
   var s=String(txt).trim();
   if(/^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)/i.test(s)||/^https?:\/\/.*media.*whatsapp/i.test(s)){
-    return'<img src="'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" onerror="this.outerHTML=\'<span style=\\'color:var(--sub)\\'>🖼️ Imagem</span>\'" />';
+    return'<img src="'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" onerror="this.parentNode.innerHTML=\'🖼️\'" />';
   }
   if(s.startsWith('data:image/')){return'<img src="'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
   if(s.startsWith('/9j/')){return'<img src="data:image/jpeg;base64,'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
   if(s.startsWith('iVBOR')){return'<img src="data:image/png;base64,'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
   if(s.startsWith('R0lG')){return'<img src="data:image/gif;base64,'+s+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)"/>';}
   if(s.length>1000&&/^[A-Za-z0-9+\/\r\n]+=*$/.test(s.replace(/[\r\n]/g,''))){
-    return'<img src="data:image/jpeg;base64,'+s.replace(/[\r\n]/g,'')+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" onerror="this.outerHTML=\'<span style=\\'color:var(--sub)\\'>🖼️ Imagem (formato não suportado)</span>\'" />';
+    return'<img src="data:image/jpeg;base64,'+s.replace(/[\r\n]/g,'')+'" style="max-width:240px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" onerror="this.parentNode.innerHTML=\'🖼️\'" />';
   }
   return esc(txt);
 }
@@ -484,7 +484,7 @@ function renderImagem(txt){
   if(src){
     return'<img src="'+src+'" style="max-width:240px;max-height:300px;border-radius:8px;display:block;cursor:pointer;object-fit:cover" '
       +'onclick="window.open(this.src,\'_blank\')" '
-      +'onerror="this.outerHTML=\'<div style=\\'color:var(--sub);font-size:12px;padding:4px 0\\'>🖼️ Imagem (clique para abrir)</div>\';this.style.cursor=\'pointer\'" />';
+      +'onerror="this.parentNode.innerHTML=\'🖼️\'" />';
   }
   return'<div style="color:var(--sub);font-size:12px">🖼️ [imagem]</div>';
 }
