@@ -315,7 +315,7 @@ function renderChat(a) {
     +'<div class="bw"><div class="bub inc"><div class="bsender al">👤 '+esc(a.nome_aluno||'Aluno')+'</div>'+esc(a.mensagem||'')+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>'
     +(a.resposta?'<div class="bw r"><div class="bub out"><div class="bsender '+(a.atendente_nome?'at':'bot')+'">'+esc(a.atendente_nome||'🤖 Bot')+'</div>'+esc(a.resposta)+'<div class="bmeta"><span class="btime">'+fmt(a.data_contato)+'</span></div></div></div>':'')
     +transferEvs+'</div>'
-    +(minhaVez&&a.status!=='resolvido'
+    +(minhaVez
       ?'<div class="cia"><textarea class="cta" id="ti" rows="1" placeholder="Responder via WhatsApp..." onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();send();}" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,120)+\'px\'"></textarea><button class="sndbtn" onclick="send()">➤</button></div>'
       :a.status==='resolvido'?'<div class="cc">✅ Resolvido por '+(a.atendente_nome||'Bot')+' em '+fmtFull(a.data_contato)+'</div>'
       :'<div class="cc">⏳ Aguardando atendente assumir</div>');
@@ -363,12 +363,24 @@ function send() {
   var inp=document.getElementById('ti'),msg=inp?inp.value.trim():'';
   if(!msg){toast('Digite uma mensagem!','e');return;}
   sending=true;
+  var sb=document.getElementById('sb');
+  if(sb){sb.disabled=true;sb.textContent='⏳';}
   fetch(API+'?action=responder',{method:'POST',headers:authH(),body:JSON.stringify({id:a.id,phone:a.numero_aluno,mensagem:msg})})
     .then(function(r){return r.json();}).then(function(d){
-      if(d.ok){toast('Enviado! 📤');a.resposta=msg;a.status='resolvido';if(inp)inp.value='';updateStats();render();renderChat(a);renderCRM(a);}
-      else toast('Erro: '+(d.error||'?'),'e');
+      if(d.ok){
+        toast('Enviado! 📤');
+        // Registra a resposta localmente mas NÃO muda o status
+        a.resposta=msg;
+        if(inp){inp.value='';inp.style.height='auto';}
+        render();
+        renderChat(a);
+        renderCRM(a);
+      } else {
+        toast('Erro: '+(d.error||'?'),'e');
+      }
       sending=false;
-    }).catch(function(){toast('Erro','e');sending=false;});
+      if(sb){sb.disabled=false;sb.textContent='➤';}
+    }).catch(function(){toast('Erro','e');sending=false;if(sb){sb.disabled=false;sb.textContent='➤';}});
 }
 
 function abrirTransferir(id) {
